@@ -33,3 +33,45 @@ The goal of this script is to add new fields with standarized Z Scores for every
 </tr>
 </tbody>
 </table>
++# CreateClassField Summary
+ +This scripting tool is designed to take selected fields and create an added field that classifies based on their unique combinations of values using numpy.
+ +# Usage
+ +The goal of this script is to add a group field based on a selection of fields chosen in the tool. Two fields will be added, one with a number representing the group ID (can be dissolved or summarized on), and another with a string with the query used to isolate it. The names of the fields are based on the base name parameter. 
+ +# Parameters
+ +<table width="100%" border="0" cellpadding="5">
+ +<tbody>
+ +<tr>
+ +<th width="30%">
+ +<b>Parameter</b>
+ +</th>
+ +<th width="50%">
+ +<b>Explanation</b>
+ +</th>
+ +<th width="20%">
+ +<b>Data Type</b>
+ +</th>
+ +</tr>
+ +<tr>
+ +<td class="info">Input_Feature_Class</td>
+ +<td class="info" align="left">
+ +<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This is the selected input feature class that will have new group fields joined to it. If the fields already exist, they will be updated by the tool. </SPAN></P></DIV></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
+ +<span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>The feature class uses the </SPAN><A href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><SPAN>ExtendTable function </SPAN></A><SPAN>used from the DA module of arcpy to join a modifed structured numpy array with column-wise group IDs joined to it. </SPAN></P></DIV></DIV></DIV></td>
+ +<td class="info" align="left">Feature Layer</td>
+ +</tr>
+ +<tr>
+ +<td class="info">Fields_to_Group</td>
+ +<td class="info" align="left">
+ +<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>These are the fields you want unique group categories of. It can be used to make a unique ID out of serveral different field attributes. </SPAN></P></DIV></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
+ +<span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>Uses dynamic query creation to generate isolated numpy arrays to join to the input table. </SPAN></P></DIV></DIV></DIV></td>
+ +<td class="info" align="left">Multiple Value</td>
+ +</tr>
+ +<tr>
+ +<td class="info">Base_Name</td>
+ +<td class="info" align="left">
+ +<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the string that is prepended to the the new field names. The field name will be this basename  along with either the strings "Num" or "String" appended to the end. </SPAN></P></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
+ +<span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>The fields will validated based on the work space. </SPAN></P></DIV></DIV></td>
+ +<td class="info" align="left">String</td>
+ +</tr>
+ +</tbody>
+ +</table>
+ +</div>
