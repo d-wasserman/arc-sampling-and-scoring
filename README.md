@@ -1,0 +1,35 @@
+# StandarizeFields Summary
+This 10.4 ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
+# Usage
+The goal of this script is to add new fields with standarized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
+![alt tag](https://github.com/Holisticnature/StandarizeFields/blob/master/Help/Test.jpg?raw=true)
+#Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input_Feature_Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>This is the selected input feature class that will have new </span><a href="http://pro.arcgis.com/en/pro-app/tool-reference/spatial-statistics/what-is-a-z-score-what-is-a-p-value.htm"><span>fields with Z scores calculated </span></a><span>joined to it. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><div><p><span>The feature class uses the </span><a href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><span>ExtendTable function </span></a><span>used from the DA module of arcpy to join a modified structured numpy array with column-wise calculated Z scores joined to it. </span></p></div></div></div></td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Fields_to_Standarize</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the fields that will have their Z scores calculated within a </span><a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html"><span>Pandas data frames</span></a><span>, converted to a structured numpy array, and then joined to the input feature class based on the object ID. The fields added will be in the form of "Zscore_"+%FieldName%. If a field of that form already exists in the table, it will be updated.</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span>Generally the fields are selected from the feature class to be converted into a numpy array, then into a pandas data frame, then back to structured numpy array to be joined based on the object ID. This tool assumes there is an object ID to use to join to. </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+</tbody>
+</table>
