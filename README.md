@@ -38,6 +38,7 @@ The goal of this script is to add new fields with standarized Z Scores for every
  This scripting tool is designed to take selected fields and create an added field that classifies based on their unique combinations of values using numpy.
  # Usage
  The goal of this script is to add a group field based on a selection of fields chosen in the tool. Two fields will be added, one with a number representing the group ID (can be dissolved or summarized on), and another with a string with the query used to isolate it. The names of the fields are based on the base name parameter. 
+
  # Parameters
  <table width="100%" border="0" cellpadding="5">
  <tbody>
