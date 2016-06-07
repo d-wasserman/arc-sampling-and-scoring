@@ -1,3 +1,6 @@
+# Distribution Summary
+A set of ArcGIS tools that use Numpy and Pandas to help with different data analysis tasks such as standarizing data and creating group IDs. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below. 
+
 # StandarizeFields Summary
 This 10.4 ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
