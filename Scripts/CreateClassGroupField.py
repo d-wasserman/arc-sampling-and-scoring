@@ -1,7 +1,7 @@
 # Name: CreateClassGroupField.py
 # Purpose: Will group selected fields into a unique group field for every unique combination of the selected fields.
 # Author: David Wasserman
-# Last Modified: 3/27/2016
+# Last Modified: 6/12/2016
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
 # ArcGIS Version: 10.3.1 (Pro)
@@ -281,6 +281,8 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
                                                            null_value={valid_num_field: 0,
                                                                        valid_text_field: "No Data"})
                 class_num_array = fcNumRecArray[valid_num_field]
+                if len(class_num_array)==0:
+                    continue #If nothing in NP array pass.
                 class_num_array.fill(counter)
                 class_string_array = fcNumRecArray[valid_text_field]
                 class_string_array.fill(combination_query)
