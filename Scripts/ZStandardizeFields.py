@@ -1,7 +1,7 @@
 # Name: ZStandardizeFields.py
 # Purpose: Will add selected fields as standarized Z scores by extending a numpy array to the feature class.
 # Author: David Wasserman
-# Last Modified: 3/27/2016
+# Last Modified: 6/26/2016
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
 # ArcGIS Version: 10.4 (Pro)
@@ -158,6 +158,8 @@ def add_Standarized_Fields(in_fc, input_Fields):
                 col_Standarized = arcpy.ValidateFieldName("Zscore_"+column,workspace)
                 fcDataFrame[col_Standarized] = (fcDataFrame[column] - fcDataFrame[column].mean())/fcDataFrame[column].std(ddof=0)
                 finalColumnList.append(col_Standarized)
+                if col_Standarized==column:
+                    continue
                 del fcDataFrame[column]
             except Exception as e:
                 arcPrint("Could not process field {0}".format(str(column)))
