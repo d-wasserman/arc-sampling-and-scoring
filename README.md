@@ -44,12 +44,6 @@ The goal of this script is to add new fields with standarized Z Scores for every
 # Usage
  The goal of this script is to add a group field based on a selection of fields chosen in the tool. Two fields will be added, one with a number representing the group ID (can be dissolved or summarized on), and another with a string with the query used to isolate it. The names of the fields are based on the base name parameter. 
 
-# TruncateDatetime
-This tool is a simple geoprocessing scripting tool intended to assist with temporal data preparation by truncating the date time object to set constants for better grouping and aggregation for time space cubes and other analysis methods. If the set times are -1, the current date and time will be used for that parameter.  
-
-# Usage
-Use this script with an input date field to create a formated time string based on your needs. 
-
 # Parameters
 
  <table width="100%" border="0" cellpadding="5">
@@ -89,7 +83,15 @@ Use this script with an input date field to create a formated time string based 
  </tbody>
  </table>
  </div>
+
 # ArcTime TBX
+
+# TruncateDatetime
+This tool is a simple geoprocessing scripting tool intended to assist with temporal data preparation by truncating the date time object to set constants for better grouping and aggregation for time space cubes and other analysis methods. If the set times are -1, the current date and time will be used for that parameter.  
+
+# Usage
+Use this script with an input date field to create a formated time string based on your needs. 
+
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
