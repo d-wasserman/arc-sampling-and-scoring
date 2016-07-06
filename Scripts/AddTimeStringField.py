@@ -1,10 +1,11 @@
-# Name: CreateClassGroupField.py
-# Purpose: Will group selected fields into a unique group field for every unique combination of the selected fields.
+# Name: AddTimeStringField.py
+# Purpose: Will take a selected datetime field and will try to add text field with a formatted date time.
+# See http://strftime.org/ for details.
 # Author: David Wasserman
-# Last Modified: 6/12/2016
+# Last Modified: 7/4/2016
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
-# ArcGIS Version: 10.3.1 (Pro)
+# ArcGIS Version: 10.4 (Pro)
 # --------------------------------
 # Copyright 2016 David J. Wasserman
 #
@@ -23,12 +24,13 @@
 # Import Modules
 import os, arcpy, datetime
 import numpy as np
-import itertools
+import pandas as pd
 
 # Define Inputs
-FeatureClass = arcpy.GetParameterAsText(0)  # r"C:"
-InputFields = arcpy.GetParameterAsText(1)  # "CBSA_POP;D5cri"
-BaseName = arcpy.GetParameterAsText(2)  # "GROUP"
+FeatureClass = arcpy.GetParameterAsText(0)
+InputField = arcpy.GetParameterAsText(1)
+NewTextFieldName = arcpy.GetParameterAsText(2)
+TimeFormat = arcpy.GetParameterAsText(3)
 
 
 # Function Definitions
@@ -48,7 +50,7 @@ def funcReport(function=None, reportBool=False):
                 return funcResult
             except Exception as e:
                 print(
-                    "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
+                "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
                 print(e.args[0])
 
         return funcWrapper
@@ -92,6 +94,7 @@ def functionTime(function=None, reportTime=True):
     else:
         return funcReport_Decorator(function)
 
+
 def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=False):
     """This decorator function is designed to be used as a wrapper with other GIS functions to enable basic try and except
      reporting (if function fails it will report the name of the function that failed and its arguments. If a report
@@ -115,7 +118,7 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
                         "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__),
                                                                                         str(args)))
                 print(
-                    "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
+                "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
                 print(e.args[0])
 
         return funcWrapper
@@ -174,128 +177,73 @@ def AddNewField(in_table, field_name, field_type, field_precision="#", field_sca
                                   field_alias,
                                   field_is_nullable, field_is_required, field_domain)
 
+@arcToolReport
+def CreateUniqueFieldName(field_name,in_table):
+    """This function will be used to create a unique field name for an ArcGIS field by adding a number to the end.
+    If the file has field character limitations, the new field name will not be validated.- DJW."""
+    counter=1
+    new_field_name=field_name
+    arcPrint(new_field_name)
+    while FieldExist(in_table, new_field_name) and counter<=1000:
+        print(field_name + " Exists, creating new name with counter {0}".format(counter))
+        new_field_name="{0}_{1}".format(str(field_name),str(counter))
+        counter+=1
+    return new_field_name
 
 @arcToolReport
-def arc_unique_values(table, field, filter_falsy=False):
-    """This function will return a list of unique values from a passed field. If the optional bool is true,
-    this function will scrub out null/falsy values. """
-    with arcpy.da.SearchCursor(table, [field]) as cursor:
-        if filter_falsy:
-            return sorted({row[0] for row in cursor if row[0]})
-        else:
-            return sorted({row[0] for row in cursor})
-
-
-@arcToolReport
-def arc_unique_value_lists(in_feature_class, field_list, filter_falsy=False):
-    """Function will returned a nested list of unique values for each field in the same order as the field list."""
-    ordered_list = []
-    len_list=[]
-    for field in field_list:
-        unique_vals = arc_unique_values(in_feature_class, field, filter_falsy)
-        len_list.append((len(unique_vals)))
-        ordered_list.append(unique_vals)
-    return ordered_list,len_list
-
-
-@arcToolReport
-def constructSQLEqualityQuery(fieldName, value, dataSource, equalityOperator="="):
-    """Creates a workspace sensitive equality query to be used in arcpy/SQL statements. If the value is a string,
-    quotes will be used for the query, otherwise they will be removed. Python 2-3 try except catch.(BaseString not in 3)
-    David Wasserman"""
-    try:  # Python 2
-        if isinstance(value, (basestring, str)):
-            return "{0} {1} '{2}'".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
-        else:
-            return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
-    except:  # Python 3
-        if isinstance(value, (str)):  # Unicode only
-            return "{0} {1} '{2}'".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
-        else:
-            return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
-
-
-@arcToolReport
-def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND", equalityOperator="="):
-    """Creates a workspace sensitive equality query that is chained with some intermediary operator. The function
-     will strip the last operator added. The passed fieldNames and values are both assumed to be ordered.
-     David Wasserman"""
-    fieldNamesLength, valuesLength = len(fieldNames), len(values)
-    index_range = range(min(fieldNamesLength, valuesLength))
-    final_chained_query = ""
-    if fieldNamesLength != valuesLength:
-        error_pot_string = "WARNING:Construct Chained SQL Query value/fields lengths do not match. Used minimum. QAQC"
-        print(error_pot_string)
-        arcpy.AddMessage(error_pot_string)
-        arcpy.AddWarning(error_pot_string)
-    for idx in index_range:
-        base_query = constructSQLEqualityQuery(fieldNames[idx], values[idx], dataSource, equalityOperator)
-        final_chained_query = "{0} {1} {2}".format(final_chained_query, chainOperator.strip(), base_query)
-    final_chained_query = final_chained_query.strip(" {0} ".format(chainOperator))
-    return final_chained_query
-
+def ArcGISTabletoDataFrame(in_fc, input_Fields):
+    """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
+    input fields."""
+    OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
+    final_Fields = [OIDFieldName] + input_Fields
+    arcPrint("Converting feature class table to numpy array.", True)
+    npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields)
+    objectIDIndex = npArray[OIDFieldName]
+    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
+    fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
+    return fcDataFrame
 
 
 @functionTime(reportTime=False)
-def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
-    """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
-    join them back to the feature class using arcpy."""
+def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
+    """ This function will take in an feature class, and use pandas/numpy to format a date string based on
+    the input time format. """
     try:
+        # arcPrint(pd.__version__) Does not have dt lib.
         arcpy.env.overwriteOutput = True
         workspace = os.path.dirname(in_fc)
+        col_new_field = arcpy.ValidateFieldName(CreateUniqueFieldName(new_field_name,in_fc), workspace)
+        AddNewField(in_fc, col_new_field, "TEXT")
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-        input_Fields_List = input_Fields.split(';')
-        arcPrint("Adding Class Fields.", True)
-        valid_num_field = arcpy.ValidateFieldName("{0}_Num".format(basename), workspace)
-        valid_text_field = arcpy.ValidateFieldName("{0}_Text".format(basename), workspace)
-        AddNewField(in_fc, valid_num_field, "LONG")
-        AddNewField(in_fc, valid_text_field, "TEXT")
-        arcPrint("Computing unique values for input fields.", True)
-        nested_unique_values,unique_values_count = arc_unique_value_lists(in_fc, input_Fields_List)
-        arcPrint("Generating a combinatorial product.", True)
-        field_unique_combos = itertools.product(*nested_unique_values)
-        combination_length=np.product(unique_values_count)
-        arcPrint("The number of combinations to be tested is : {0}".format(combination_length))
-        if combination_length > 1000:
-            arcpy.AddWarning(
-                "The number of combinations to be tested is over 1 thousand. Memory usage and run time could be large.")
-        if combination_length > 10000:
-            arcpy.AddWarning(
-            "The number of combinations to be tested is over 10 thousand. Memory usage and run time could be very large.")
-        if combination_length > 1000000:
-            arcpy.AddWarning(
-                "The number of combinations to be tested is over 1 million. Memory usage and run time could be huge.")
-        if combination_length > 1000000000:
-            arcpy.AddWarning(
-                "The number of combinations to be tested is over 1 billion. ...What are you doing exactly?")
-        counter = 1
-        arcPrint("Constructing class groups.", True)
-        for combination in field_unique_combos:
-            try:
-                combination_query = constructChainedSQLQuery(input_Fields_List, combination, in_fc)
-                if combination_length<=1000:
-                    arcPrint("Processing query: {0}".format(combination_query), True)
-                fcNumRecArray = arcpy.da.TableToNumPyArray(in_fc, [OIDFieldName, valid_num_field, valid_text_field],
-                                                           where_clause=combination_query,
-                                                           null_value={valid_num_field: 0,
-                                                                       valid_text_field: "No Data"})
-                class_num_array = fcNumRecArray[valid_num_field]
-                if len(class_num_array)==0:
-                    continue #If nothing in NP array pass.
-                class_num_array.fill(counter)
-                class_string_array = fcNumRecArray[valid_text_field]
-                class_string_array.fill(combination_query)
-                arcpy.da.ExtendTable(in_fc, OIDFieldName, fcNumRecArray, OIDFieldName, append_only=False)
-                counter += 1
-            except Exception as e:
-                arcPrint("ERROR: Skipped query {0}. QAQC.".format(combination_query), True)
-                arcPrint(str(e.args[0]))
+        arcPrint("Creating Pandas Dataframe from input table.")
+        fcDataFrame = ArcGISTabletoDataFrame(in_fc, [input_field, col_new_field])
+        JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
+        fcDataFrame[JoinField] = fcDataFrame.index
+        try:
+            arcPrint("Creating new text column based on field {0}.".format(str(input_field)), True)
+            fcDataFrame[col_new_field] = fcDataFrame[input_field].apply(lambda dt: dt.strftime(time_format))
+            del fcDataFrame[input_field]
+        except Exception as e:
+            del fcDataFrame[input_field]
+            arcPrint(
+                "Could not process datetime field. "
+                "Check that datetime is a year appropriate to your python version and that "
+                "the time format string is appropriate.")
+            arcPrint(e.args[0])
+            pass
+
+        arcPrint("Exporting new time field dataframe to structured numpy array.", True)
+        finalStandardArray = fcDataFrame.to_records()
+        arcPrint("Joining new time string field to feature class.", True)
+        arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
+        arcPrint("Delete temporary intermediates.")
+        del fcDataFrame,finalStandardArray
         arcPrint("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        print(arcpy.GetMessages(2))
+        arcPrint(arcpy.GetMessages(2))
     except Exception as e:
-        print(e.args[0])
+        arcPrint(e.args[0])
 
         # End do_analysis function
 
@@ -305,4 +253,4 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
-    create_Class_Group_Field(FeatureClass, InputFields, BaseName)
+    add_Time_String_Field(FeatureClass, InputField, NewTextFieldName, TimeFormat)
