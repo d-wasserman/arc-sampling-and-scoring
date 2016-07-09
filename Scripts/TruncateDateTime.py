@@ -217,14 +217,29 @@ def IfValueTargetReturnAlt(value, alternative, target=None):
     else:
         return alternative
 
+@arcToolReport
 def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second, original_dt_target=-1):
-    new_year=IfValueTargetReturnAlt(year, datetime_obj.year, original_dt_target)
-    new_month=IfValueTargetReturnAlt(month, datetime_obj.month, original_dt_target)
-    new_day=IfValueTargetReturnAlt(day, datetime_obj.day, original_dt_target)
-    new_hour=IfValueTargetReturnAlt(hour, datetime_obj.hour, original_dt_target)
-    new_minute=IfValueTargetReturnAlt(minute, datetime_obj.minute, original_dt_target)
-    new_second=IfValueTargetReturnAlt(second, datetime_obj.second, original_dt_target)
-    return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute, second=new_second)
+    """Will assign a new date time within an apply function based on the type of object present. Starts with asking
+    for forgiveness rather than permission to get original object properties, then uses isinstance to the appropriate
+    datetime object to return."""
+    try:
+        new_year=IfValueTargetReturnAlt(year, datetime_obj.year, original_dt_target)
+        new_month=IfValueTargetReturnAlt(month, datetime_obj.month, original_dt_target)
+        new_day=IfValueTargetReturnAlt(day, datetime_obj.day, original_dt_target)
+    except:
+        pass
+    try:
+        new_hour=IfValueTargetReturnAlt(hour, datetime_obj.hour, original_dt_target)
+        new_minute=IfValueTargetReturnAlt(minute, datetime_obj.minute, original_dt_target)
+        new_second=IfValueTargetReturnAlt(second, datetime_obj.second, original_dt_target)
+    except:
+        pass
+    if isinstance(datetime_obj,datetime.datetime):
+        return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute, second=new_second)
+    elif isinstance(datetime_obj,datetime.date):
+        return datetime.date(year=new_year, month=new_month, day=new_day)
+    else:
+        return datetime.time(hour=new_hour, minute=new_minute, second=new_second)
 
 
 @functionTime(reportTime=False)
