@@ -183,7 +183,6 @@ def CreateUniqueFieldName(field_name,in_table):
     If the file has field character limitations, the new field name will not be validated.- DJW."""
     counter=1
     new_field_name=field_name
-    arcPrint(new_field_name)
     while FieldExist(in_table, new_field_name) and counter<=1000:
         print(field_name + " Exists, creating new name with counter {0}".format(counter))
         new_field_name="{0}_{1}".format(str(field_name),str(counter))
