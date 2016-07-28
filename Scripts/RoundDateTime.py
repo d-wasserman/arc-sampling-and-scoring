@@ -1,7 +1,7 @@
-# Name: TruncateDateTime.py
-# Purpose: Will take a selected datetime field and will truncate it to chosen values for each of the chosen sub dates.
+# Name: RoundDateTime.py
+# Purpose: Will take a selected datetime field and will round it to the nearest increment denoted for each unit.
 # Author: David Wasserman
-# Last Modified: 7/4/2016
+# Last Modified: 7/24/2016
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
 # ArcGIS Version: 10.4 (Pro)
@@ -29,20 +29,20 @@ import pandas as pd
 FeatureClass = arcpy.GetParameterAsText(0)
 InputField = arcpy.GetParameterAsText(1)
 NewTextFieldName = arcpy.GetParameterAsText(2)
-SetYear = arcpy.GetParameter(3)
-SetMonth = arcpy.GetParameter(4)
-SetDay = arcpy.GetParameter(5)
-SetHour = arcpy.GetParameter(6)
-SetMinute = arcpy.GetParameter(7)
-SetSecond = arcpy.GetParameter(8)
+RoundYear = arcpy.GetParameter(3)
+RoundMonth = arcpy.GetParameter(4)
+RoundDay = arcpy.GetParameter(5)
+RoundHour = arcpy.GetParameter(6)
+RoundMinute = arcpy.GetParameter(7)
+RoundSecond = arcpy.GetParameter(8)
 
 
 # Function Definitions
+
 def funcReport(function=None, reportBool=False):
     """This decorator function is designed to be used as a wrapper with other functions to enable basic try and except
      reporting (if function fails it will report the name of the function that failed and its arguments. If a report
       boolean is true the function will report inputs and outputs of a function.-David Wasserman"""
-
     def funcReport_Decorator(function):
         def funcWrapper(*args, **kwargs):
             try:
@@ -209,28 +209,50 @@ def ArcGISTabletoDataFrame(in_fc, input_Fields):
     return fcDataFrame
 
 @arcToolReport
-def IfValueTargetReturnAlt(value, alternative, target=None):
+def RoundDownByValueIfNotTarget(value, alternative, target=None):
     """If value is not target (depending on parameters), return alternative."""
     if value is not target or value != target:
-        return value
+        return (alternative//value)*value
     else:
         return alternative
 
 @arcToolReport
-def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second, original_dt_target=-1):
-    """Will assign a new date time within an apply function based on the type of object present. Starts with asking
-    for forgiveness rather than permission to get original object properties, then uses isinstance to the appropriate
-    datetime object to return."""
+def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, original_dt_target=-1):
+    """Will round a new date time to the year increment within an apply function based on the type of object present.
+    The rounded date time will take the smallest unit not to be the dt_target, and make all units smaller 0 by integer
+    dividing by a large number. Starts with asking for forgiveness rather than permission to get original object
+    properties, then uses isinstance to the appropriate datetime object to return."""
+    time_list=[year,month,day, hour, minute, second]
+    counter=0
+    index=0
+    for time in time_list:
+        counter+=1
+        if time!=original_dt_target:
+            index=counter
+    if index==0:
+        pass
+    elif index==1:
+        month,day,hour,minute,second=10000,10000,10000,10000,10000
+    elif index==2:
+        day,hour,minute,second=10000,10000,10000,10000
+    elif index==3:
+        hour,minute,second=10000,10000,10000
+    elif index==4:
+        minute,second=10000,10000
+    elif index==5:
+        second=10000
+    else:
+        pass
     try:
-        new_year=IfValueTargetReturnAlt(year, datetime_obj.year, original_dt_target)
-        new_month=IfValueTargetReturnAlt(month, datetime_obj.month, original_dt_target)
-        new_day=IfValueTargetReturnAlt(day, datetime_obj.day, original_dt_target)
+        new_year=RoundDownByValueIfNotTarget(year, datetime_obj.year, original_dt_target)
+        new_month=RoundDownByValueIfNotTarget(month, datetime_obj.month, original_dt_target)
+        new_day=RoundDownByValueIfNotTarget(day, datetime_obj.day, original_dt_target)
     except:
         pass
     try:
-        new_hour=IfValueTargetReturnAlt(hour, datetime_obj.hour, original_dt_target)
-        new_minute=IfValueTargetReturnAlt(minute, datetime_obj.minute, original_dt_target)
-        new_second=IfValueTargetReturnAlt(second, datetime_obj.second, original_dt_target)
+        new_hour=RoundDownByValueIfNotTarget(hour, datetime_obj.hour, original_dt_target)
+        new_minute=RoundDownByValueIfNotTarget(minute, datetime_obj.minute, original_dt_target)
+        new_second=RoundDownByValueIfNotTarget(second, datetime_obj.second, original_dt_target)
     except:
         pass
     if isinstance(datetime_obj,datetime.datetime):
@@ -242,7 +264,7 @@ def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second, or
 
 
 @functionTime(reportTime=False)
-def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
+def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
                        set_minute=None, set_second=None):
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the
      passed date-time attributes are set to a target."""
@@ -260,7 +282,7 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
         try:
             arcPrint("Creating new date-time column based on field {0}.".format(str(input_field)), True)
             fcDataFrame[col_new_field]=fcDataFrame[input_field].apply(
-                lambda dt: assign_new_datetime(dt,set_year,set_month,set_day,set_hour,set_minute,set_second)).astype(datetime.datetime)
+                lambda dt: round_new_datetime(dt,set_year,set_month,set_day,set_hour,set_minute,set_second)).astype(datetime.datetime)
             del fcDataFrame[input_field]
         except Exception as e:
             del fcDataFrame[input_field]
@@ -292,5 +314,5 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
-    truncate_date_time(FeatureClass, InputField, NewTextFieldName, SetYear, SetMonth, SetDay, SetHour, SetMinute,
-                          SetSecond)
+    round_date_time(FeatureClass, InputField, NewTextFieldName, RoundYear, RoundMonth, RoundDay, RoundHour, RoundMinute,
+                    RoundSecond)
