@@ -279,9 +279,11 @@ def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interva
                 start_time_range = start_time_min
                 end_time_range = start_time_max
             time_bins = construct_time_bin_ranges(start_time_range, end_time_range, time_delta)
+            arcPrint("Constructing queries based on datetime ranges.")
             temporal_queries = construct_sql_queries_from_time_bin(time_bins, inFeatureClass, start_time_field,
                                                                    end_time_field)
             time_counter = 0
+            arcPrint("Splitting feature classes based on {0} queries.".format(len(temporal_queries)),True)
             for query in temporal_queries:
                 try:
                     time_counter += 1
