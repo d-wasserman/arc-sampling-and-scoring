@@ -32,6 +32,7 @@ outWorkSpace = arcpy.GetParameterAsText(1)
 start_time_field = arcpy.GetParameterAsText(2)
 end_time_field = arcpy.GetParameterAsText(3)
 time_interval = arcpy.GetParameter(4)
+bin_start_time= arcpy.GetParameter(5)
 compactWorkspace = arcpy.GetParameter(5)
 
 
@@ -245,7 +246,7 @@ def parse_time_units_to_dt(float_magnitude, time_units):
 
 # Main Function Definition
 @arcToolReport
-def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interval, compactBool=True):
+def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interval, bin_start=None, compactBool=True):
     """ This tool will split a feature class into multiple feature classes based on a datetime field based on
     a set time interval."""
     try:
@@ -278,6 +279,10 @@ def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interva
                 end_time_field = start_time
                 start_time_range = start_time_min
                 end_time_range = start_time_max
+            if isinstance(bin_start_time,datetime.datetime) or isinstance(bin_start_time,datetime.date):
+                start_time_range=bin_start_time
+                arcPrint("Bin Start Time was selected, using {0} as bin starting time period."
+                         .format(str(bin_start_time)))
             time_bins = construct_time_bin_ranges(start_time_range, end_time_range, time_delta)
             arcPrint("Constructing queries based on datetime ranges.")
             temporal_queries = construct_sql_queries_from_time_bin(time_bins, inFeatureClass, start_time_field,
@@ -321,4 +326,5 @@ def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interva
 
 # Main Script
 if __name__ == "__main__":
-    do_analysis(inFeatureClass, outWorkSpace, start_time_field, end_time_field, time_interval, compactWorkspace)
+    do_analysis(inFeatureClass, outWorkSpace, start_time_field, end_time_field, time_interval,bin_start_time,
+                compactWorkspace)

@@ -334,7 +334,7 @@
 </div>
 <h2 class="gp" xmlns="">Syntax</h2>
 <div xmlns="">
-<p style="margin-top: -1.2em">TruncateDateTime (Input_Feature_Class, Date_Time_Field, New_Field_Name, Set_Year, Set_Month, Set_Day, Set_Hour, Set_Minute, Set_Second) <br /><br />
+<p style="margin-top: -1.2em">TruncateDateTime (Input_Feature_Class, Date_Time_Field, New_Field_Name, Set_Year, Set_Month, Set_Day, Set_Hour, Set_Minute, Set_Second, Set_Microsecond) <br /><br />
 </p>
 <table width="100%" border="0" cellpadding="5">
 <tbody>
@@ -366,7 +366,7 @@
 <tr>
 <td class="info">New_Field_Name</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This is the name of the new text field that will be added to the feature class and then populated by a new time string based on the format string. If the name already exists, then a unique one will be added. </SPAN></P></DIV></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This is the name of the new text field that will be added to the feature class and then populated by a new truncated datetime. If the name already exists, then a unique one will be added. </SPAN></P></DIV></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">String</td>
 </tr>
 <tr>
@@ -402,7 +402,13 @@
 <tr>
 <td class="info">Set_Second</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the second you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This is the second you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<td class="info" align="left">Long</td>
+</tr>
+<tr>
+<td class="info">Set_Microsecond</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This is the second you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 </tbody>

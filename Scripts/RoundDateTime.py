@@ -217,30 +217,33 @@ def RoundDownByValueIfNotTarget(value, alternative, target=None):
         return alternative
 
 @arcToolReport
-def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, original_dt_target=-1):
+def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, microsecond=-1,original_dt_target=-1):
     """Will round a new date time to the year increment within an apply function based on the type of object present.
     The rounded date time will take the smallest unit not to be the dt_target, and make all units smaller 0 by integer
     dividing by a large number. Starts with asking for forgiveness rather than permission to get original object
     properties, then uses isinstance to the appropriate datetime object to return."""
-    time_list=[year,month,day, hour, minute, second]
+    time_list=[year,month,day, hour, minute, second,microsecond]
     counter=0
     index=0
     for time in time_list:
         counter+=1
         if time!=original_dt_target:
             index=counter
+    arcPrint(index)
     if index==0:
         pass
     elif index==1:
-        month,day,hour,minute,second=10000,10000,10000,10000,10000
+        month,day,hour,minute,second,microsecond=1000000,1000000,1000000,1000000,1000000,1000000
     elif index==2:
-        day,hour,minute,second=10000,10000,10000,10000
+        day,hour,minute,second,microsecond=1000000,1000000,1000000,1000000,1000000
     elif index==3:
-        hour,minute,second=10000,10000,10000
+        hour,minute,second,microsecond=1000000,1000000,1000000,1000000
     elif index==4:
-        minute,second=10000,10000
+        minute,second,microsecond=1000000,1000000,1000000
     elif index==5:
-        second=10000
+        second,microsecond=1000000,1000000
+    elif index==6:
+        microsecond=1000000
     else:
         pass
     try:
@@ -253,14 +256,16 @@ def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, ori
         new_hour=RoundDownByValueIfNotTarget(hour, datetime_obj.hour, original_dt_target)
         new_minute=RoundDownByValueIfNotTarget(minute, datetime_obj.minute, original_dt_target)
         new_second=RoundDownByValueIfNotTarget(second, datetime_obj.second, original_dt_target)
+        new_microsecond=RoundDownByValueIfNotTarget(microsecond, datetime_obj.microsecond, original_dt_target)
     except:
         pass
     if isinstance(datetime_obj,datetime.datetime):
-        return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute, second=new_second)
+        return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute,
+                                 second=new_second,microsecond=new_microsecond)
     elif isinstance(datetime_obj,datetime.date):
         return datetime.date(year=new_year, month=new_month, day=new_day)
     else:
-        return datetime.time(hour=new_hour, minute=new_minute, second=new_second)
+        return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
 
 
 @functionTime(reportTime=False)

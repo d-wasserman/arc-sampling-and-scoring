@@ -35,7 +35,7 @@ SetDay = arcpy.GetParameter(5)
 SetHour = arcpy.GetParameter(6)
 SetMinute = arcpy.GetParameter(7)
 SetSecond = arcpy.GetParameter(8)
-
+SetMicroSecond=arcpy.GetParameter(9)
 
 # Function Definitions
 def funcReport(function=None, reportBool=False):
@@ -217,7 +217,7 @@ def IfValueTargetReturnAlt(value, alternative, target=None):
         return alternative
 
 @arcToolReport
-def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second, original_dt_target=-1):
+def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second,microsecond=0, original_dt_target=-1):
     """Will assign a new date time within an apply function based on the type of object present. Starts with asking
     for forgiveness rather than permission to get original object properties, then uses isinstance to the appropriate
     datetime object to return."""
@@ -231,19 +231,21 @@ def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second, or
         new_hour=IfValueTargetReturnAlt(hour, datetime_obj.hour, original_dt_target)
         new_minute=IfValueTargetReturnAlt(minute, datetime_obj.minute, original_dt_target)
         new_second=IfValueTargetReturnAlt(second, datetime_obj.second, original_dt_target)
+        new_microsecond=IfValueTargetReturnAlt(microsecond,datetime_obj.microsecond,original_dt_target)
     except:
         pass
     if isinstance(datetime_obj,datetime.datetime):
-        return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute, second=new_second)
+        return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute,
+                                 second=new_second,microsecond=new_microsecond)
     elif isinstance(datetime_obj,datetime.date):
         return datetime.date(year=new_year, month=new_month, day=new_day)
     else:
-        return datetime.time(hour=new_hour, minute=new_minute, second=new_second)
+        return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
 
 
 @functionTime(reportTime=False)
 def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
-                       set_minute=None, set_second=None):
+                       set_minute=None, set_second=None,set_microsecond=None):
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the
      passed date-time attributes are set to a target."""
     try:
@@ -260,7 +262,8 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
         try:
             arcPrint("Creating new date-time column based on field {0}.".format(str(input_field)), True)
             fcDataFrame[col_new_field]=fcDataFrame[input_field].apply(
-                lambda dt: assign_new_datetime(dt,set_year,set_month,set_day,set_hour,set_minute,set_second)).astype(datetime.datetime)
+                lambda dt: assign_new_datetime(dt,set_year,set_month,set_day,set_hour,set_minute,set_second,
+                                               set_microsecond)).astype(datetime.datetime)
             del fcDataFrame[input_field]
         except Exception as e:
             del fcDataFrame[input_field]
@@ -293,4 +296,4 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
 # another script
 if __name__ == '__main__':
     truncate_date_time(FeatureClass, InputField, NewTextFieldName, SetYear, SetMonth, SetDay, SetHour, SetMinute,
-                          SetSecond)
+                          SetSecond,SetMicroSecond)
