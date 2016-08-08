@@ -136,21 +136,18 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
         return arcToolReport_Decorator(function)
 
 
+@arcToolReport
 def arcPrint(string, progressor_Bool=False):
-    try:
-        if progressor_Bool:
-            arcpy.SetProgressorLabel(string)
-            arcpy.AddMessage(string)
-            print(string)
-        else:
-            arcpy.AddMessage(string)
-            print(string)
-    except arcpy.ExecuteError:
-        arcpy.GetMessages(2)
-        pass
-    except:
-        arcpy.AddMessage("Could not create message, bad arguments.")
-        pass
+    """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
+    create a tool label."""
+    casted_string=str(string)
+    if progressor_Bool:
+        arcpy.SetProgressorLabel(casted_string)
+        arcpy.AddMessage(casted_string)
+        print(casted_string)
+    else:
+        arcpy.AddMessage(casted_string)
+        print(casted_string)
 
 
 @arcToolReport()

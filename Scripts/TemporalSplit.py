@@ -1,6 +1,6 @@
 # --------------------------------
 # Name: TemporalSplit.py
-# Purpose: Split a feature class based on either a single time or a start or end time based on a set
+# Purpose: Split a feature class based on either a single time or a start or end time based one a set date time.
 # Current Owner: David Wasserman
 # Last Modified: 7/28/2016
 # Copyright:   (c) Co-Adaptive- David Wasserman
@@ -140,23 +140,16 @@ def AddNewField(in_table, field_name, field_type, field_precision="#", field_sca
 
 @arcToolReport
 def arcPrint(string, progressor_Bool=False):
-    # This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it wll
-    # create a tool label.
-    try:
-        if progressor_Bool:
-            arcpy.SetProgressorLabel(string)
-            arcpy.AddMessage(string)
-            print(string)
-        else:
-            arcpy.AddMessage(string)
-            print(string)
-    except arcpy.ExecuteError:
-        arcpy.GetMessages(2)
-        pass
-    except:
-        print("Could not create message, bad arguments.")
-        pass
-
+    """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
+    create a tool label."""
+    casted_string=str(string)
+    if progressor_Bool:
+        arcpy.SetProgressorLabel(casted_string)
+        arcpy.AddMessage(casted_string)
+        print(casted_string)
+    else:
+        arcpy.AddMessage(casted_string)
+        print(casted_string)
 
 @arcToolReport
 def get_min_max_from_field(table, field):
@@ -231,6 +224,8 @@ def parse_time_units_to_dt(float_magnitude, time_units):
     weeks = 0
     if re.search(micro_search, str(time_units)):
         microseconds = float_magnitude
+    if re.search(milli_search,str(time_units)):
+        milliseconds=float_magnitude
     if re.search(second_search, str(time_units)):
         seconds = float_magnitude
     if re.search(minute_search, str(time_units)):
@@ -255,7 +250,7 @@ def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interva
             arcpy.env.overwriteOutput = True
             arcPrint("The current work space is: {0}.".format(outWorkSpace), True)
             workSpaceTail = os.path.split(outWorkSpace)[1]
-            arcPrint("Constructing Esri Time Delta from input time period string.", True)
+            arcPrint("Constructing Time Delta from input time period string.", True)
             time_magnitude, time_unit = alphanumeric_split(time_interval)
             time_delta=parse_time_units_to_dt(time_magnitude,time_unit)
             inFeatureClassTail = os.path.split(inFeatureClass)[1]
