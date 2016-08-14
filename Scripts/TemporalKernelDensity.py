@@ -230,7 +230,7 @@ def alphanumeric_split(time_string):
      It will lower case and remove all white space in the string first, and return a number as float and alpha text
      as a string. """
     preprocessed_string = str(time_string).replace(" ", "").lower()
-    string_list = filter(None, re.split(r'(\d+)', preprocessed_string))
+    string_list=[string for string in re.split(r'(\d+)', preprocessed_string) if string]
     number = float(string_list[0])
     string = str(string_list[1])
     return number, string
@@ -312,10 +312,15 @@ def temporal_kernel_density(inFeatureClass, outWorkSpace, outTemporalName, start
             except:
                 arcpy.AddWarning("Could not create Moasic Dataset. Time enablement is not possible.")
                 pass
-            arcpy.RefreshCatalog(outWorkSpace)
+            try:
+                arcpy.RefreshCatalog(outWorkSpace)
+            except:
+                arcPrint("Could not refresh catalog.")
+                pass
             # Set up Time Deltas and Parse Time String
             arcPrint("Constructing Time Delta from input time period string.", True)
-            time_magnitude, time_unit = alphanumeric_split(time_interval)
+            arcPrint(str(time_interval))
+            time_magnitude, time_unit = alphanumeric_split(str(time_interval))
             time_delta = parse_time_units_to_dt(time_magnitude, time_unit)
             arcPrint(
                     "Using datetime fields to generate new feature classes in {0}.".format(
