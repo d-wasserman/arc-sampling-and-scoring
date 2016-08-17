@@ -92,6 +92,7 @@ def functionTime(function=None, reportTime=True):
     else:
         return funcReport_Decorator(function)
 
+
 def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=False):
     """This decorator function is designed to be used as a wrapper with other GIS functions to enable basic try and except
      reporting (if function fails it will report the name of the function that failed and its arguments. If a report
@@ -133,7 +134,7 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
 def arcPrint(string, progressor_Bool=False):
     """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
     create a tool label."""
-    casted_string=str(string)
+    casted_string = str(string)
     if progressor_Bool:
         arcpy.SetProgressorLabel(casted_string)
         arcpy.AddMessage(casted_string)
@@ -187,33 +188,38 @@ def arc_unique_values(table, field, filter_falsy=False):
 def arc_unique_value_lists(in_feature_class, field_list, filter_falsy=False):
     """Function will returned a nested list of unique values for each field in the same order as the field list."""
     ordered_list = []
-    len_list=[]
+    len_list = []
     for field in field_list:
         unique_vals = arc_unique_values(in_feature_class, field, filter_falsy)
         len_list.append((len(unique_vals)))
         ordered_list.append(unique_vals)
-    return ordered_list,len_list
+    return ordered_list, len_list
 
 
 @arcToolReport
-def constructSQLEqualityQuery(fieldName, value, dataSource, equalityOperator="="):
+def constructSQLEqualityQuery(fieldName, value, dataSource, equalityOperator="=", noneEqualityOperator="is"):
     """Creates a workspace sensitive equality query to be used in arcpy/SQL statements. If the value is a string,
     quotes will be used for the query, otherwise they will be removed. Python 2-3 try except catch.(BaseString not in 3)
     David Wasserman"""
     try:  # Python 2
         if isinstance(value, (basestring, str)):
             return "{0} {1} '{2}'".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
+        if value is None:
+            return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), noneEqualityOperator,"NULL")
         else:
             return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
     except:  # Python 3
         if isinstance(value, (str)):  # Unicode only
             return "{0} {1} '{2}'".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
+        if value is None:
+            return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), noneEqualityOperator,"NULL")
         else:
             return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
 
 
 @arcToolReport
-def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND", equalityOperator="="):
+def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND", equalityOperator="=",
+                             noneEqualityOperator="is"):
     """Creates a workspace sensitive equality query that is chained with some intermediary operator. The function
      will strip the last operator added. The passed fieldNames and values are both assumed to be ordered.
      David Wasserman"""
@@ -232,7 +238,6 @@ def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND"
     return final_chained_query
 
 
-
 @functionTime(reportTime=False)
 def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
     """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
@@ -248,37 +253,37 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
         AddNewField(in_fc, valid_num_field, "LONG")
         AddNewField(in_fc, valid_text_field, "TEXT")
         arcPrint("Computing unique values for input fields.", True)
-        nested_unique_values,unique_values_count = arc_unique_value_lists(in_fc, input_Fields_List)
+        nested_unique_values, unique_values_count = arc_unique_value_lists(in_fc, input_Fields_List)
         arcPrint("Generating a combinatorial product.", True)
         field_unique_combos = itertools.product(*nested_unique_values)
-        combination_length=np.product(unique_values_count)
+        combination_length = np.product(unique_values_count)
         arcPrint("The number of combinations to be tested is : {0}".format(combination_length))
         if combination_length > 1000:
             arcpy.AddWarning(
-                "The number of combinations to be tested is over 1 thousand. Memory usage and run time could be large.")
+                    "The number of combinations to be tested is over 1 thousand. Memory usage and run time could be large.")
         if combination_length > 10000:
             arcpy.AddWarning(
-            "The number of combinations to be tested is over 10 thousand. Memory usage and run time could be very large.")
+                    "The number of combinations to be tested is over 10 thousand. Memory usage and run time could be very large.")
         if combination_length > 1000000:
             arcpy.AddWarning(
-                "The number of combinations to be tested is over 1 million. Memory usage and run time could be huge.")
+                    "The number of combinations to be tested is over 1 million. Memory usage and run time could be huge.")
         if combination_length > 1000000000:
             arcpy.AddWarning(
-                "The number of combinations to be tested is over 1 billion. ...What are you doing exactly?")
+                    "The number of combinations to be tested is over 1 billion. ...What are you doing exactly?")
         counter = 1
         arcPrint("Constructing class groups.", True)
         for combination in field_unique_combos:
             try:
                 combination_query = constructChainedSQLQuery(input_Fields_List, combination, in_fc)
-                if combination_length<=1000:
+                if combination_length <= 1000:
                     arcPrint("Processing query: {0}".format(combination_query), True)
                 fcNumRecArray = arcpy.da.TableToNumPyArray(in_fc, [OIDFieldName, valid_num_field, valid_text_field],
                                                            where_clause=combination_query,
                                                            null_value={valid_num_field: 0,
                                                                        valid_text_field: "No Data"})
                 class_num_array = fcNumRecArray[valid_num_field]
-                if len(class_num_array)==0:
-                    continue #If nothing in NP array pass.
+                if len(class_num_array) == 0:
+                    continue  # If nothing in NP array pass.
                 class_num_array.fill(counter)
                 class_string_array = fcNumRecArray[valid_text_field]
                 class_string_array.fill(combination_query)
