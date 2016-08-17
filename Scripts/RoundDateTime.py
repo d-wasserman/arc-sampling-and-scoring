@@ -260,9 +260,10 @@ def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, mic
                                  second=new_second,microsecond=new_microsecond)
     elif isinstance(datetime_obj,datetime.date):
         return datetime.date(year=new_year, month=new_month, day=new_day)
-    else:
+    elif isinstance(datetime_obj,datetime.time):
         return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
-
+    else:
+        return None
 
 @functionTime(reportTime=False)
 def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
