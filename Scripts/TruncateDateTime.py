@@ -239,10 +239,9 @@ def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second,mic
             return datetime.date(year=new_year, month=new_month, day=new_day)
         elif isinstance(datetime_obj,datetime.time):
             return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
-        else:# If it is something else, send back out what you took in.
-            return datetime_obj
-    except: # If it breaks, send it back out.
-        return datetime_obj
+        else:# If it is something else,send back max datetime.
+    except:
+
 
 
 @functionTime(reportTime=False)

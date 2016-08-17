@@ -225,7 +225,6 @@ def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, mic
         counter+=1
         if time!=original_dt_target:
             index=counter
-    arcPrint(index)
     if index==0:
         pass
     elif index==1:
@@ -263,10 +262,11 @@ def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, mic
             return datetime.date(year=new_year, month=new_month, day=new_day)
         elif isinstance(datetime_obj,datetime.time):
             return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
-        else:# If it is something else, send back out what you took in.
-            return datetime_obj
-    except: # If it breaks, send it back out.
-        return datetime_obj
+        else:# If it is something else,send back max datetime.
+            return datetime.date.min
+    except:
+        return datetime.date.min
+
 
 @functionTime(reportTime=False)
 def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
