@@ -240,7 +240,9 @@ def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second,mic
         elif isinstance(datetime_obj,datetime.time):
             return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
         else:# If it is something else,send back max datetime.
+            return datetime.date.min
     except:
+        return datetime.date.min
 
 
 
