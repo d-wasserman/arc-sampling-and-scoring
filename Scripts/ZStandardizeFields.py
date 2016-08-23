@@ -125,17 +125,20 @@ def arcPrint(string, progressor_Bool=False):
         print(casted_string)
 
 @arcToolReport
-def ArcGISTabletoDataFrame(in_fc,input_Fields):
+def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", spatial_ref=None, explode_to_pt=False, skip_nulls=False,
+                           null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
     input fields."""
-    OIDFieldName=arcpy.Describe(in_fc).OIDFieldName
-    final_Fields=[OIDFieldName]+input_Fields
-    arcPrint("Converting feature class table to numpy array.",True)
-    npArray=arcpy.da.TableToNumPyArray(in_fc,final_Fields)
-    objectIDIndex=npArray[OIDFieldName]
-    arcPrint("Converting feature class numpy array into pandas dataframe.",True)
-    fcDataFrame=pd.DataFrame(npArray,index=objectIDIndex,columns=input_Fields)
+    OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
+    final_Fields = [OIDFieldName] + input_Fields
+    arcPrint("Converting feature class table to numpy array.", True)
+    npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, spatial_ref, explode_to_pt, skip_nulls,
+                                         null_values)
+    objectIDIndex = npArray[OIDFieldName]
+    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
+    fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
     return fcDataFrame
+
 
 
 @functionTime(reportTime=False)
