@@ -211,7 +211,8 @@ def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
         AddNewField(in_fc, col_new_field, "TEXT")
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
         arcPrint("Creating Pandas Dataframe from input table.")
-        fcDataFrame = ArcGISTabletoDataFrame(in_fc, [input_field, col_new_field])
+        query= "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field),"is NOT","NULL")
+        fcDataFrame = ArcGISTabletoDataFrame(in_fc, [input_field, col_new_field],query)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         fcDataFrame[JoinField] = fcDataFrame.index
         try:
