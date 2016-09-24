@@ -195,7 +195,7 @@ def arc_unique_value_lists(in_feature_class, field_list, filter_falsy=False):
         ordered_list.append(unique_vals)
     return ordered_list, len_list
 
-
+#Not Used
 @arcToolReport
 def constructSQLEqualityQuery(fieldName, value, dataSource, equalityOperator="=", noneEqualityOperator="is"):
     """Creates a workspace sensitive equality query to be used in arcpy/SQL statements. If the value is a string,
@@ -215,8 +215,7 @@ def constructSQLEqualityQuery(fieldName, value, dataSource, equalityOperator="="
             return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), noneEqualityOperator,"NULL")
         else:
             return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
-
-
+#Not Used
 @arcToolReport
 def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND", equalityOperator="=",
                              noneEqualityOperator="is"):
@@ -237,6 +236,18 @@ def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND"
     final_chained_query = final_chained_query.strip(" {0} ".format(chainOperator))
     return final_chained_query
 
+@arcToolReport
+def constructUniqueStringID(values,delimiter="."):
+    """Creates a unique string id based on delimited passed values. The function will strip the last/first
+     delimiters added.-David Wasserman"""
+    final_chained_id = ""
+    for value in values:
+        final_chained_id = "{0}{1}{2}".format(final_chained_id,str(delimiter),str(value))
+        final_chained_id=final_chained_id
+    final_chained_id = final_chained_id.strip("{0}".format(delimiter))
+    return final_chained_id
+
+
 
 @functionTime(reportTime=False)
 def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
@@ -245,53 +256,33 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
     try:
         arcpy.env.overwriteOutput = True
         workspace = os.path.dirname(in_fc)
-        OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
         input_Fields_List = input_Fields.split(';')
         arcPrint("Adding Class Fields.", True)
         valid_num_field = arcpy.ValidateFieldName("{0}_Num".format(basename), workspace)
         valid_text_field = arcpy.ValidateFieldName("{0}_Text".format(basename), workspace)
         AddNewField(in_fc, valid_num_field, "LONG")
         AddNewField(in_fc, valid_text_field, "TEXT")
-        arcPrint("Computing unique values for input fields.", True)
-        nested_unique_values, unique_values_count = arc_unique_value_lists(in_fc, input_Fields_List)
-        arcPrint("Generating a combinatorial product.", True)
-        field_unique_combos = itertools.product(*nested_unique_values)
-        combination_length = np.product(unique_values_count)
-        arcPrint("The number of combinations to be tested is : {0}".format(combination_length))
-        if combination_length > 1000:
-            arcpy.AddWarning(
-                    "The number of combinations to be tested is over 1 thousand. Memory usage and run time could be large.")
-        if combination_length > 10000:
-            arcpy.AddWarning(
-                    "The number of combinations to be tested is over 10 thousand. Memory usage and run time could be very large.")
-        if combination_length > 1000000:
-            arcpy.AddWarning(
-                    "The number of combinations to be tested is over 1 million. Memory usage and run time could be huge.")
-        if combination_length > 1000000000:
-            arcpy.AddWarning(
-                    "The number of combinations to be tested is over 1 billion. ...What are you doing exactly?")
-        counter = 1
-        arcPrint("Constructing class groups.", True)
-        for combination in field_unique_combos:
-            try:
-                combination_query = constructChainedSQLQuery(input_Fields_List, combination, in_fc)
-                if combination_length <= 1000:
-                    arcPrint("Processing query: {0}".format(combination_query), True)
-                fcNumRecArray = arcpy.da.TableToNumPyArray(in_fc, [OIDFieldName, valid_num_field, valid_text_field],
-                                                           where_clause=combination_query,
-                                                           null_value={valid_num_field: 0,
-                                                                       valid_text_field: "No Data"})
-                class_num_array = fcNumRecArray[valid_num_field]
-                if len(class_num_array) == 0:
-                    continue  # If nothing in NP array pass.
-                class_num_array.fill(counter)
-                class_string_array = fcNumRecArray[valid_text_field]
-                class_string_array.fill(combination_query)
-                arcpy.da.ExtendTable(in_fc, OIDFieldName, fcNumRecArray, OIDFieldName, append_only=False)
-                counter += 1
-            except Exception as e:
-                arcPrint("ERROR: Skipped query {0}. QAQC.".format(combination_query), True)
-                arcPrint(str(e.args[0]))
+        arcPrint("Constructing class groups within dictionary.", True)
+        unique_class_dict={}
+        cursor_fields=input_Fields_List +[valid_text_field,valid_num_field]
+        with arcpy.da.UpdateCursor(in_fc,cursor_fields) as cursor:
+            counter=0
+            group_id=1
+            for row in cursor:
+                try:
+                    group_field_values=row[:-2] #Grab all but last two fields.
+                    unique_id=constructUniqueStringID(group_field_values)
+                    if unique_id not in unique_class_dict:
+                        unique_class_dict[unique_id]=group_id
+                        group_id+=1
+                    row[-1]=unique_class_dict[unique_id]
+                    row[-2]=unique_id
+                    cursor.updateRow(row)
+                    counter += 1
+                except Exception as e:
+                    arcPrint("ERROR: Skipped at iteration {0}. QAQC.".format(counter), True)
+                    arcPrint(str(e.args[0]))
+        del unique_class_dict
         arcPrint("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
