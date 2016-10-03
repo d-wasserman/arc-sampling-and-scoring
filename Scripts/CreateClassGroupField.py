@@ -143,18 +143,16 @@ def arcPrint(string, progressor_Bool=False):
         arcpy.AddMessage(casted_string)
         print(casted_string)
 
-
-@arcToolReport()
+@arcToolReport
 def FieldExist(featureclass, fieldname):
     """ArcFunction
      Check if a field in a feature class field exists and return true it does, false if not.- David Wasserman"""
     fieldList = arcpy.ListFields(featureclass, fieldname)
     fieldCount = len(fieldList)
-    if (fieldCount >= 1):  # If there is one or more of this field return true
+    if (fieldCount >= 1)and fieldname.strip():  # If there is one or more of this field return true
         return True
     else:
         return False
-
 
 @arcToolReport
 def AddNewField(in_table, field_name, field_type, field_precision="#", field_scale="#", field_length="#",

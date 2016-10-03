@@ -1,7 +1,7 @@
 # --------------------------------
-# Name: TemporalKernelDensity.py
-# Purpose: Runs multiple kernel densities on a feature class based on either a single time
-#  or a start or end time based on a set datetime. The result is a temporally enabled moasic dataset.
+# Name: TemporalMeanCenter.py
+# Purpose: Runs multiple mean center(s) (analysis)  on a feature class based on either a single time
+#  or a start or end time based on a set datetime. The result is a merged feature class.
 # Current Owner: David Wasserman
 # Last Modified: 7/28/2016
 # Copyright:   (c) Co-Adaptive- David Wasserman
@@ -30,20 +30,15 @@ import numpy as np
 # Define Inputs
 # Temporal Params
 inFeatureClass = arcpy.GetParameterAsText(0)
-outWorkSpace = arcpy.GetParameterAsText(1)
-outputMosaicName = arcpy.GetParameterAsText(2)
-start_time_field = arcpy.GetParameterAsText(3)
-end_time_field = arcpy.GetParameterAsText(4)
-time_interval = arcpy.GetParameter(5)
-bin_start_time = arcpy.GetParameter(6)
-# Kernel Density Params
-population_field = arcpy.GetParameterAsText(7)  # Default to NONE
-cell_size = arcpy.GetParameter(8)  # Default to 50
-search_radius = arcpy.GetParameter(9)  # Required
-area_unit_scale_factor = arcpy.GetParameterAsText(10)  # Default "SQUARE_MILES"
-out_cell_values = arcpy.GetParameter(11)  # Default "DENSITY"
-# Optional Finish
-compactWorkspace = arcpy.GetParameter(12)
+outFeatureClass = arcpy.GetParameterAsText(1)
+start_time_field = arcpy.GetParameterAsText(2)
+end_time_field = arcpy.GetParameterAsText(3)
+time_interval = arcpy.GetParameter(4)
+bin_start_time = arcpy.GetParameter(5)
+# Mean Center Params
+case_field = arcpy.GetParameterAsText(6)
+weight_field = arcpy.GetParameterAsText(7)
+dimension_field = arcpy.GetParameterAsText(8)
 
 
 # Function Definitions
@@ -114,21 +109,27 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
         return arcToolReport_Decorator(function)
 
 
-@arcToolReport
-def recalculate_mosaic_statistics(mosaic_dataset):
-    arcPrint("Recalculating Mosaic Statistics.")
-    arcpy.management.CalculateStatistics(mosaic_dataset)
-    arcpy.management.BuildPyramidsandStatistics(mosaic_dataset, 'INCLUDE_SUBDIRECTORIES', 'BUILD_PYRAMIDS',
-                                                'CALCULATE_STATISTICS')
-    arcpy.RefreshCatalog(mosaic_dataset)
-
+def getFields(featureClass, excludedTolkens=["OID", "Geometry"], excludedFields=["shape_area", "shape_length"]):
+    try:
+        fcName = os.path.split(featureClass)[1]
+        field_list = [f.name for f in arcpy.ListFields(featureClass) if f.type not in excludedTolkens
+                      and f.name.lower() not in excludedFields]
+        arcPrint("The field list for {0} is:{1}".format(str(fcName), str(field_list)), True)
+        return field_list
+    except:
+        arcPrint("Could not get fields for the following input {0}, returned an empty list.".format(str(featureClass)),
+                 True)
+        arcpy.AddWarning(
+                "Could not get fields for the following input {0}, returned an empty list.".format(str(featureClass)))
+        field_list = []
+        return field_list
 
 @arcToolReport
 def FieldExist(featureclass, fieldname):
-    # Check if a field in a feature class field exists and return true it does, false if not.
+    """ Check if a field in a feature class field exists and return true it does, false if not."""
     fieldList = arcpy.ListFields(featureclass, fieldname)
     fieldCount = len(fieldList)
-    if (fieldCount >= 1):  # If there is one or more of this field return true
+    if (fieldCount >= 1)and fieldname.strip():  # If there is one or more of this field return true
         return True
     else:
         return False
@@ -150,7 +151,7 @@ def AddNewField(in_table, field_name, field_type, field_precision="#", field_sca
                                   field_is_nullable, field_is_required, field_domain)
 
 
-@arcToolReport
+#@arcToolReport
 def arcPrint(string, progressor_Bool=False):
     """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
     create a tool label."""
@@ -166,9 +167,9 @@ def arcPrint(string, progressor_Bool=False):
 
 @arcToolReport
 def get_min_max_from_field(table, field):
-    """Get min and max value from input data."""
+    """Get min and max value from input feature class/table."""
     with arcpy.da.SearchCursor(table, [field]) as cursor:
-        data = [row[0] for row in cursor]
+        data = [row[0] for row in cursor if row[0]]
         return min(data), max(data)
 
 
@@ -214,7 +215,7 @@ def alphanumeric_split(time_string):
      It will lower case and remove all white space in the string first, and return a number as float and alpha text
      as a string. """
     preprocessed_string = str(time_string).replace(" ", "").lower()
-    string_list = filter(None, re.split(r'(\d+)', preprocessed_string))
+    string_list = [string for string in re.split(r'(\d+)', preprocessed_string) if string]
     number = float(string_list[0])
     string = str(string_list[1])
     return number, string
@@ -222,6 +223,9 @@ def alphanumeric_split(time_string):
 
 @arcToolReport
 def parse_time_units_to_dt(float_magnitude, time_units):
+    """This function will take a string with time units and a float associated with it. It will return
+    a delta time based on the float and the passed time units. So float is 1 and time_units is 'hour' then
+    it returns a time delta object equal to 1 hour"""
     micro_search = re.compile(r"microsecond")
     milli_search = re.compile(r"millisecond")
     second_search = re.compile(r"second")
@@ -254,15 +258,26 @@ def parse_time_units_to_dt(float_magnitude, time_units):
                               milliseconds=milliseconds, hours=hours, weeks=weeks)
 
 
+@arcToolReport
+def constructUniqueStringID(values, delimiter="."):
+    """Creates a unique string id based on delimited passed values. The function will strip the last/first
+     delimiters added.-David Wasserman"""
+    final_chained_id = ""
+    for value in values:
+        final_chained_id = "{0}{1}{2}".format(final_chained_id, str(delimiter), str(value))
+        final_chained_id = final_chained_id
+    final_chained_id = final_chained_id.strip("{0}".format(delimiter))
+    return final_chained_id
+
+
 # Main Function Definition
 @arcToolReport
-def temporal_kernel_density(inFeatureClass, outWorkSpace, outMosaicName, start_time, end_time, time_interval,
-                            kernel_pop_field,
-                            kernel_cell_size, kernel_search_rad, kernel_area_unit, kernel_out_values="DENSITIES",
-                            kernel_method="PLANAR", bin_start=None, compactBool=True):
+def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, time_interval, bin_start,
+                         weight_field, case_field, dimension_field):
     """ This tool will split a feature class into multiple kernel densities based on a datetime field and a
     a set time interval. The result will be a time enabled moasic with Footprint. """
     try:
+        outWorkSpace = os.path.dirname(outFeatureClass)
         if arcpy.Exists(outWorkSpace):
             arcpy.env.workspace = outWorkSpace
             arcpy.env.overwriteOutput = True
@@ -270,32 +285,36 @@ def temporal_kernel_density(inFeatureClass, outWorkSpace, outMosaicName, start_t
             # Set up Work Space Environments
             out_workspace_path_split = os.path.split(outWorkSpace)
             workSpaceTail = out_workspace_path_split[1]
-            #arcpy.env.scratchWorkspace = out_workspace_path_split[0]
             inFeatureClassTail = os.path.split(inFeatureClass)[1]
-            scratchDatabase = outWorkSpace
             arcPrint("Gathering describe object information from workspace and input feature class.")
-            fc_desc = arcpy.Describe(inFeatureClass)
-            spatial_ref = fc_desc.spatialReference
             ws_desc = arcpy.Describe(outWorkSpace)
-            if ws_desc.dataType != "Workspace":
-                arcpy.AddWarning("You neeed a valid geodatabase as workspace to create a moasic dataset,"
-                                 " this tool will put raw raster files in the output workspace selected.")
-
-            created_Moasic = False
+            workspace_is_geodatabase = ws_desc.dataType == "Workspace" or ws_desc.dataType == "FeatureDataset"
             fin_output_workspace = outWorkSpace
-            try:
-                arcPrint("Attempting to create Mosaic dataset in output workspace.")
-                arcpy.CreateMosaicDataset_management(outWorkSpace, outMosaicName, spatial_ref,
-                                                     "1", "32_BIT_FLOAT", "NONE", "NONE")
-                created_Moasic = True
-                fin_output_workspace = os.path.join(outWorkSpace, outMosaicName)
-            except:
-                arcpy.AddWarning("Could not create Moasic Dataset. Time enablement is not possible.")
-                pass
+            # Generate Table with Join FIelds
 
+            try:
+                arcPrint("Attempting to create Temporal Table in output workspace.")
+                outTemporalName = "TemporalTable"
+                temporal_table_path = os.path.join("in_memory", outTemporalName)
+                arcpy.CreateTable_management("in_memory", outTemporalName)
+                join_id_field=arcpy.ValidateFieldName("TemporalJoinID", fin_output_workspace)
+                AddNewField(temporal_table_path,join_id_field,"TEXT")
+                AddNewField(temporal_table_path, arcpy.ValidateFieldName("Bin_Number", fin_output_workspace), "LONG")
+                AddNewField(temporal_table_path, arcpy.ValidateFieldName("DT_Start_Bin", fin_output_workspace), "DATE",
+                            field_alias="Start Bin Datetime")
+                AddNewField(temporal_table_path, arcpy.ValidateFieldName("DT_End_Bin", fin_output_workspace), "DATE",
+                            field_alias="End Bin Datetime")
+                AddNewField(temporal_table_path, arcpy.ValidateFieldName("TXT_Start_Bin", fin_output_workspace), "TEXT",
+                            field_alias="Start Bin String")
+                AddNewField(temporal_table_path, arcpy.ValidateFieldName("TXT_End_Bin", fin_output_workspace), "TEXT",
+                            field_alias="End Bin String")
+                AddNewField(temporal_table_path, arcpy.ValidateFieldName("Extract_Query", fin_output_workspace), "TEXT")
+            except:
+                arcpy.AddWarning("Could not create Moasic Dataset Time Table. Time enablement is not possible.")
+                pass
             # Set up Time Deltas and Parse Time String
             arcPrint("Constructing Time Delta from input time period string.", True)
-            time_magnitude, time_unit = alphanumeric_split(time_interval)
+            time_magnitude, time_unit = alphanumeric_split(str(time_interval))
             time_delta = parse_time_units_to_dt(time_magnitude, time_unit)
             arcPrint(
                     "Using datetime fields to generate new feature classes in {0}.".format(
@@ -327,60 +346,62 @@ def temporal_kernel_density(inFeatureClass, outWorkSpace, outMosaicName, start_t
                                                                    end_time_field)
             # Transition to kernel density creation
             time_counter = 0
+            temporal_record_table = []
             arcPrint("Generating kernel densities based on {0} queries.".format(len(temporal_queries)), True)
             for query in temporal_queries:
                 try:
                     time_counter += 1
                     arcPrint("Determining name and constructing query for new feature class.", True)
-                    newFCName = "Bin_{0}_{1}".format(time_counter,
-                                                     arcpy.ValidateTableName(inFeatureClassTail, fin_output_workspace))
-                    expression = str(query)
-                    arcPrint(
-                            "Created Kernel Density {0} with query [{1}] and created a new raster in {2}".format(
-                                    newFCName, expression, workSpaceTail), True)
+                    newFCName="TempFCBin_{0}".format(str(time_counter))
+                    if not workspace_is_geodatabase:
+                        newFCName = newFCName[0:13]  # Truncate Name if not workspace.
+                    arcPrint("Creating Mean Center with query '{0}'.".format(str(query)), True)
                     temporary_layer = arcpy.MakeFeatureLayer_management(inFeatureClass, newFCName, query)
                     # Break up general density to have pop field set to none if no actually field exists.
-                    if not FieldExist(inFeatureClass, kernel_pop_field):
-                        kernel_pop_field = "NONE"
-                    out_raster = arcpy.sa.KernelDensity(temporary_layer, kernel_pop_field, kernel_cell_size,
-                                                        kernel_search_rad,
-                                                        kernel_area_unit, kernel_out_values, kernel_method)
-                    temporary_raster_path = os.path.join(scratchDatabase, str(newFCName))
-                    out_raster.save(temporary_raster_path)
-
-                    if created_Moasic:
-                        arcPrint("Adding raster {0}, to Mosaic dataset.".format(newFCName))
-                        arcpy.AddRastersToMosaicDataset_management(fin_output_workspace, "Raster Dataset",
-                                                                   temporary_raster_path,
-                                                                   update_cellsize_ranges="UPDATE_CELL_SIZES",
-                                                                   update_overviews="UPDATE_OVERVIEWS",
-                                                                   sub_folder="NO_SUBFOLDERS",
-                                                                   build_pyramids="BUILD_PYRAMIDS",
-                                                                   calculate_statistics="CALCULATE_STATISTICS",
-                                                                   duplicate_items_action="OVERWRITE_DUPLICATES")
+                    temporal_mean_center = "in_memory/MCTemporalTemp"
+                    arcpy.MeanCenter_stats(temporary_layer, temporal_mean_center, weight_field, case_field,
+                                           dimension_field)
+                    start_date_time = time_bins[time_counter - 1][0]
+                    end_date_time = time_bins[time_counter - 1][1]
+                    start_bin_time_string = str(start_date_time)
+                    end_bin_time_string = str(end_date_time)
+                    if not workspace_is_geodatabase:
+                        arcpy.AddWarning("DBF tables can only accept date fields, not datetimes."
+                                         " Please check string field.")
+                        start_date_time = start_date_time.date()
+                        end_date_time = end_date_time.date()
+                    # Create Unique ID
+                    arcPrint("Adding Unique Join ID for the current query.",True)
+                    AddNewField(temporal_mean_center, join_id_field, "TEXT", field_alias="TEMPORAL_JOIN_ID")
+                    join_fields = [join_id_field]
+                    case_present = False
+                    if FieldExist(temporal_mean_center, case_field):
+                        join_fields = [join_id_field, case_field]
+                        case_present = True
+                    with arcpy.da.UpdateCursor(temporal_mean_center,join_fields) as join_cursor:
+                        for row in join_cursor:
+                            unique_id = constructUniqueStringID([str("1"),str(time_counter)])
+                            if case_present:
+                                unique_id = constructUniqueStringID([str(row[1]),str(time_counter)])
+                            row[0] = unique_id
+                            join_cursor.updateRow(row)
+                            temporal_record_table.append([unique_id,time_counter, start_date_time, end_date_time,
+                                                          start_bin_time_string, end_bin_time_string, query])
+                    if time_counter==1:
+                        arcpy.CopyFeatures_management(temporal_mean_center,outFeatureClass)
                     else:
-                        arcPrint("Not saving rasters in a Mosaic dataset, saving it in work space: {0}.".format(
-                                fin_output_workspace))
-                        out_raster.save(os.path.join(fin_output_workspace, str(newFCName)[0:13]))
-                    del out_raster
-                except Exception as e:
-                    arcPrint(
-                            "The feature raster ID {0}, could not be extracted to Mosaic. Check arguments".format(
-                                    str(newFCName)))
-                    arcpy.AddWarning(str(e.args[0]))
-                    pass
-            #Synchronize and update
-            arcpy.SynchronizeMosaicDataset_management()
-            # Database Clean up
-            if arcpy.Exists(scratchDatabase):
-                arcpy.Delete_management(scratchDatabase)
-            if compactBool:
-                try:
-                    arcPrint("Compacting workspace.", True)
-                    arcpy.Compact_management(outWorkSpace)
+                        arcpy.Append_management(temporal_mean_center,outFeatureClass)
                 except:
-                    arcPrint("Not a Compact capable workspace.")
-                    pass
+                    arcPrint("Could not process query {0}.".format(str(query)))
+
+            arcPrint("Adding record values to Temporal Table with an insert cursor.",True)
+            table_fields= getFields(temporal_table_path)
+            with arcpy.da.InsertCursor(temporal_table_path,table_fields) as cursor:
+                for records in temporal_record_table:
+                    cursor.insertRow(records)
+                arcPrint("Finished inserting records for database.")
+            arcPrint("Joining temporal fields to Temporal Mean Center Feature Class.",True)
+            arcpy.JoinField_management(outFeatureClass,join_id_field,temporal_table_path,join_id_field,table_fields)
             arcPrint("Tool execution complete.", True)
             pass
         else:
@@ -395,8 +416,5 @@ def temporal_kernel_density(inFeatureClass, outWorkSpace, outMosaicName, start_t
 
 # Main Script
 if __name__ == "__main__":
-    temporal_kernel_density(inFeatureClass, outWorkSpace, outputMosaicName, start_time_field, end_time_field,
-                            time_interval,
-                            bin_start=bin_start_time, kernel_pop_field=population_field, kernel_cell_size=cell_size,
-                            kernel_search_rad=search_radius, kernel_area_unit=area_unit_scale_factor,
-                            kernel_out_values=out_cell_values, compactBool=compactWorkspace)
+    temporal_mean_center(inFeatureClass, outFeatureClass, start_time_field, end_time_field,
+                         time_interval, bin_start_time, weight_field, case_field, dimension_field)
