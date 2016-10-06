@@ -124,12 +124,13 @@ def getFields(featureClass, excludedTolkens=["OID", "Geometry"], excludedFields=
         field_list = []
         return field_list
 
+
 @arcToolReport
 def FieldExist(featureclass, fieldname):
     """ Check if a field in a feature class field exists and return true it does, false if not."""
     fieldList = arcpy.ListFields(featureclass, fieldname)
     fieldCount = len(fieldList)
-    if (fieldCount >= 1)and fieldname.strip():  # If there is one or more of this field return true
+    if (fieldCount >= 1) and fieldname.strip():  # If there is one or more of this field return true
         return True
     else:
         return False
@@ -150,8 +151,7 @@ def AddNewField(in_table, field_name, field_type, field_precision="#", field_sca
                                   field_alias,
                                   field_is_nullable, field_is_required, field_domain)
 
-
-#@arcToolReport
+@arcToolReport
 def arcPrint(string, progressor_Bool=False):
     """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
     create a tool label."""
@@ -270,6 +270,30 @@ def constructUniqueStringID(values, delimiter="."):
     return final_chained_id
 
 
+def join_record_dictionary(in_feature_class,join_dictionary,unique_id_field,join_fields_order):
+    """Uses an arc update cursor to join fields to an input feature class. Inputs are a feature class, a
+    join dictionary of form {unique_id_field:[ordered,join,field,list],the feature class join field, and the join fields
+    in the same order as the lists in the join dictionary. """
+    unique_id_list=join_dictionary.keys()
+    cursor_fields= [unique_id_field]+join_fields_order
+    feature_name=os.path.split(in_feature_class)[1]
+    arcPrint("Joining dictionary to input feature class {0}.".format(feature_name),True)
+    with arcpy.da.UpdateCursor(in_feature_class,cursor_fields) as join_cursor:
+        for row in join_cursor:
+            if row[0] in unique_id_list:
+                values=join_dictionary[row[0]]
+                if len(values)!= len(join_fields_order):
+                    arcpy.AddError("Length of values in dictionary does not match join_fields_order.")
+                value_index_list=enumerate(values,start=1)
+                for index_value_pair in value_index_list :
+                    try:
+                        row[index_value_pair[0]]=index_value_pair[1]
+                    except:
+                        pass
+            join_cursor.updateRow(row)
+
+
+
 # Main Function Definition
 @arcToolReport
 def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, time_interval, bin_start,
@@ -290,28 +314,7 @@ def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, 
             ws_desc = arcpy.Describe(outWorkSpace)
             workspace_is_geodatabase = ws_desc.dataType == "Workspace" or ws_desc.dataType == "FeatureDataset"
             fin_output_workspace = outWorkSpace
-            # Generate Table with Join FIelds
 
-            try:
-                arcPrint("Attempting to create Temporal Table in output workspace.")
-                outTemporalName = "TemporalTable"
-                temporal_table_path = os.path.join("in_memory", outTemporalName)
-                arcpy.CreateTable_management("in_memory", outTemporalName)
-                join_id_field=arcpy.ValidateFieldName("TemporalJoinID", fin_output_workspace)
-                AddNewField(temporal_table_path,join_id_field,"TEXT")
-                AddNewField(temporal_table_path, arcpy.ValidateFieldName("Bin_Number", fin_output_workspace), "LONG")
-                AddNewField(temporal_table_path, arcpy.ValidateFieldName("DT_Start_Bin", fin_output_workspace), "DATE",
-                            field_alias="Start Bin Datetime")
-                AddNewField(temporal_table_path, arcpy.ValidateFieldName("DT_End_Bin", fin_output_workspace), "DATE",
-                            field_alias="End Bin Datetime")
-                AddNewField(temporal_table_path, arcpy.ValidateFieldName("TXT_Start_Bin", fin_output_workspace), "TEXT",
-                            field_alias="Start Bin String")
-                AddNewField(temporal_table_path, arcpy.ValidateFieldName("TXT_End_Bin", fin_output_workspace), "TEXT",
-                            field_alias="End Bin String")
-                AddNewField(temporal_table_path, arcpy.ValidateFieldName("Extract_Query", fin_output_workspace), "TEXT")
-            except:
-                arcpy.AddWarning("Could not create Moasic Dataset Time Table. Time enablement is not possible.")
-                pass
             # Set up Time Deltas and Parse Time String
             arcPrint("Constructing Time Delta from input time period string.", True)
             time_magnitude, time_unit = alphanumeric_split(str(time_interval))
@@ -344,15 +347,22 @@ def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, 
             arcPrint("Constructing queries based on datetime ranges.")
             temporal_queries = construct_sql_queries_from_time_bin(time_bins, inFeatureClass, start_time_field,
                                                                    end_time_field)
-            # Transition to kernel density creation
+            # Declare New Temporal Field Names
+            join_id_field = arcpy.ValidateFieldName("TemporalJoinID", fin_output_workspace)
+            bin_number = arcpy.ValidateFieldName("Bin_Number", fin_output_workspace)
+            dt_starttime = arcpy.ValidateFieldName("DT_Start_Bin", fin_output_workspace)
+            dt_endtime = arcpy.ValidateFieldName("DT_End_Bin", fin_output_workspace)
+            txt_starttime = arcpy.ValidateFieldName("TXT_Start_Bin", fin_output_workspace)
+            txt_endtime = arcpy.ValidateFieldName("TXT_End_Bin", fin_output_workspace)
+            extract_query_field = arcpy.ValidateFieldName("Extract_Query", fin_output_workspace)
+            # Transition to temporal iteration
             time_counter = 0
-            temporal_record_table = []
-            arcPrint("Generating kernel densities based on {0} queries.".format(len(temporal_queries)), True)
+            temporal_record_dict={}
+            arcPrint("Generating Mean Centers based on {0} queries.".format(len(temporal_queries)), True)
             for query in temporal_queries:
                 try:
                     time_counter += 1
-                    arcPrint("Determining name and constructing query for new feature class.", True)
-                    newFCName="TempFCBin_{0}".format(str(time_counter))
+                    newFCName = "TempFCBin_{0}".format(str(time_counter))
                     if not workspace_is_geodatabase:
                         newFCName = newFCName[0:13]  # Truncate Name if not workspace.
                     arcPrint("Creating Mean Center with query '{0}'.".format(str(query)), True)
@@ -371,37 +381,43 @@ def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, 
                         start_date_time = start_date_time.date()
                         end_date_time = end_date_time.date()
                     # Create Unique ID
-                    arcPrint("Adding Unique Join ID for the current query.",True)
                     AddNewField(temporal_mean_center, join_id_field, "TEXT", field_alias="TEMPORAL_JOIN_ID")
                     join_fields = [join_id_field]
                     case_present = False
                     if FieldExist(temporal_mean_center, case_field):
                         join_fields = [join_id_field, case_field]
                         case_present = True
-                    with arcpy.da.UpdateCursor(temporal_mean_center,join_fields) as join_cursor:
+                    with arcpy.da.UpdateCursor(temporal_mean_center, join_fields) as join_cursor:
                         for row in join_cursor:
-                            unique_id = constructUniqueStringID([str("1"),str(time_counter)])
+                            unique_id = constructUniqueStringID([str("1"), str(time_counter)])
                             if case_present:
-                                unique_id = constructUniqueStringID([str(row[1]),str(time_counter)])
+                                unique_id = constructUniqueStringID([str(row[1]), str(time_counter)])
                             row[0] = unique_id
                             join_cursor.updateRow(row)
-                            temporal_record_table.append([unique_id,time_counter, start_date_time, end_date_time,
-                                                          start_bin_time_string, end_bin_time_string, query])
-                    if time_counter==1:
-                        arcpy.CopyFeatures_management(temporal_mean_center,outFeatureClass)
-                    else:
-                        arcpy.Append_management(temporal_mean_center,outFeatureClass)
-                except:
-                    arcPrint("Could not process query {0}.".format(str(query)))
+                            temporal_record_dict[unique_id]=[time_counter, start_date_time, end_date_time,
+                                                          start_bin_time_string, end_bin_time_string, query]
 
-            arcPrint("Adding record values to Temporal Table with an insert cursor.",True)
-            table_fields= getFields(temporal_table_path)
-            with arcpy.da.InsertCursor(temporal_table_path,table_fields) as cursor:
-                for records in temporal_record_table:
-                    cursor.insertRow(records)
-                arcPrint("Finished inserting records for database.")
-            arcPrint("Joining temporal fields to Temporal Mean Center Feature Class.",True)
-            arcpy.JoinField_management(outFeatureClass,join_id_field,temporal_table_path,join_id_field,table_fields)
+                    if time_counter == 1:
+                        arcPrint("Copying First Mean Center to Output Feature Class.")
+                        arcpy.CopyFeatures_management(temporal_mean_center, outFeatureClass)
+                    else:
+                        arcPrint("Appending Mean Center to Output Feature Class.")
+                        arcpy.Append_management(temporal_mean_center, outFeatureClass)
+                    arcpy.Delete_management(temporal_mean_center)  # memory management
+                except:
+                    arcpy.AddWarning("Could not process query {0}.".format(str(query)))
+            arcPrint("Adding time fields to output temporal feature class.", True)
+            AddNewField(outFeatureClass, bin_number, "LONG")
+            AddNewField(outFeatureClass, dt_starttime, "DATE", field_alias="Start Bin Datetime")
+            AddNewField(outFeatureClass, dt_endtime, "DATE", field_alias="End Bin Datetime")
+            AddNewField(outFeatureClass, txt_starttime, "TEXT", field_alias="Start Bin String")
+            AddNewField(outFeatureClass, txt_endtime, "TEXT", field_alias="End Bin String")
+            AddNewField(outFeatureClass, extract_query_field, "TEXT")
+
+            arcPrint("Joining Temporal values by joining a dictionary to the unique ID.", True)
+            table_fields = [bin_number,dt_starttime,dt_endtime,txt_starttime,txt_endtime,
+                            extract_query_field]
+            join_record_dictionary(outFeatureClass,temporal_record_dict,join_id_field, table_fields)
             arcPrint("Tool execution complete.", True)
             pass
         else:
