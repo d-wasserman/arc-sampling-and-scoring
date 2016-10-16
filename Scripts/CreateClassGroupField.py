@@ -253,7 +253,8 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
     join them back to the feature class using arcpy."""
     try:
         arcpy.env.overwriteOutput = True
-        workspace = os.path.dirname(in_fc)
+        desc = arcpy.Describe(in_fc)
+        workspace= os.path.dirname(desc.catalogPath)
         input_Fields_List = input_Fields.split(';')
         arcPrint("Adding Class Fields.", True)
         valid_num_field = arcpy.ValidateFieldName("{0}_Num".format(basename), workspace)
@@ -284,9 +285,9 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
         arcPrint("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        print(arcpy.GetMessages(2))
+        arcPrint(arcpy.GetMessages(2))
     except Exception as e:
-        print(e.args[0])
+        arcPrint(e.args[0])
 
         # End do_analysis function
 

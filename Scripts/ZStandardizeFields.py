@@ -145,8 +145,9 @@ def add_Standarized_Fields(in_fc, input_Fields):
     join them back to the feature class using arcpy."""
     try:
         arcpy.env.overwriteOutput = True
-        workspace=os.path.dirname(in_fc)
-        OIDFieldName=arcpy.Describe(in_fc).OIDFieldName
+        desc = arcpy.Describe(in_fc)
+        OIDFieldName=desc.OIDFieldName
+        workspace= os.path.dirname(desc.catalogPath)
         input_Fields_List=input_Fields.split(';')
         fcDataFrame=ArcGISTabletoDataFrame(in_fc,input_Fields_List)
         finalColumnList=[]
@@ -173,9 +174,9 @@ def add_Standarized_Fields(in_fc, input_Fields):
         arcPrint("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        print(arcpy.GetMessages(2))
+        arcPrint(arcpy.GetMessages(2))
     except Exception as e:
-        print(e.args[0])
+        arcPrint(e.args[0])
 
     # End do_analysis function
 

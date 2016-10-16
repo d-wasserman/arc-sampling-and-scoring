@@ -255,7 +255,8 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
     try:
         # arcPrint(pd.__version__) Does not have dt lib.
         arcpy.env.overwriteOutput = True
-        workspace = os.path.dirname(in_fc)
+        desc = arcpy.Describe(in_fc)
+        workspace= os.path.dirname(desc.catalogPath)
         col_new_field = arcpy.ValidateFieldName(CreateUniqueFieldName(new_field_name, in_fc), workspace)
         AddNewField(in_fc, col_new_field, "DATE")
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
