@@ -229,7 +229,8 @@ def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND"
         arcpy.AddMessage(error_pot_string)
         arcpy.AddWarning(error_pot_string)
     for idx in index_range:
-        base_query = constructSQLEqualityQuery(fieldNames[idx], values[idx], dataSource, equalityOperator)
+        base_query = constructSQLEqualityQuery(fieldNames[idx], values[idx], dataSource, equalityOperator,
+                                               noneEqualityOperator)
         final_chained_query = "{0} {1} {2}".format(final_chained_query, chainOperator.strip(), base_query)
     final_chained_query = final_chained_query.strip(" {0} ".format(chainOperator))
     return final_chained_query
