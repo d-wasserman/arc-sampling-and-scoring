@@ -406,14 +406,14 @@ def temporal_aggregate_field(inFeatureClass, outFeatureClass, start_time, end_ti
                     arcpy.AddWarning(str(e.args[0]))
                     pass
 
-            # arcPrint("Adding record values to Temporal Table with an insert cursor.")
-            # table_fields= getFields(outFeatureClass)
+            # arc_print("Adding record values to Temporal Table with an insert cursor.")
+            # table_fields= get_fields(outFeatureClass)
             # with arcpy.da.InsertCursor(outFeatureClass,table_fields) as cursor:
             #     for records in temporal_record_table:
             #         cursor.insertRow(records)
-            #     arcPrint("Finished inserting records for database.")
+            #     arc_print("Finished inserting records for database.")
             #     del cursor
-            # arcPrint("Tool execution complete.", True)
+            # arc_print("Tool execution complete.", True)
             pass
         else:
             arcPrint("The desired workspace does not exist. Tool execution terminated.", True)

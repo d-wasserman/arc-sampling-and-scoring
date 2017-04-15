@@ -253,7 +253,7 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the
      passed date-time attributes are set to a target."""
     try:
-        # arcPrint(pd.__version__) Does not have dt lib.
+        # arc_print(pd.__version__) Does not have dt lib.
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
         workspace= os.path.dirname(desc.catalogPath)
