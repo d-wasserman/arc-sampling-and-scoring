@@ -231,8 +231,10 @@ def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND"
     for idx in index_range:
         base_query = constructSQLEqualityQuery(fieldNames[idx], values[idx], dataSource, equalityOperator,
                                                noneEqualityOperator)
-        final_chained_query = "{0} {1} {2}".format(final_chained_query, chainOperator.strip(), base_query)
-    final_chained_query = final_chained_query.strip(" {0} ".format(chainOperator))
+        if idx==0:
+            final_chained_query = "{0} {1}".format(base_query, final_chained_query)
+        else:
+            final_chained_query = "{0} {1} {2}".format(base_query, chainOperator.strip(),final_chained_query)
     return final_chained_query
 
 @arcToolReport
