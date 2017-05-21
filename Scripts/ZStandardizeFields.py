@@ -27,6 +27,7 @@ import pandas as pd
 # Define Inputs
 FeatureClass =arcpy.GetParameterAsText(0)
 InputFields= arcpy.GetParameterAsText(1)
+IgnoreNulls = arcpy.GetParameter(2)
 
 
 
@@ -140,7 +141,7 @@ def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null
 
 
 @functionTime(reportTime=False)
-def add_Standarized_Fields(in_fc, input_Fields):
+def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
     """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
     join them back to the feature class using arcpy."""
     try:
@@ -149,7 +150,7 @@ def add_Standarized_Fields(in_fc, input_Fields):
         OIDFieldName=desc.OIDFieldName
         workspace= os.path.dirname(desc.catalogPath)
         input_Fields_List=input_Fields.split(';')
-        fcDataFrame=ArcGISTabletoDataFrame(in_fc,input_Fields_List)
+        fcDataFrame=ArcGISTabletoDataFrame(in_fc,input_Fields_List,skip_nulls=ignore_nulls)
         finalColumnList=[]
         for column in fcDataFrame:
             try:
@@ -185,4 +186,4 @@ def add_Standarized_Fields(in_fc, input_Fields):
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
-    add_Standarized_Fields(FeatureClass,InputFields)
+    add_Standarized_Fields(FeatureClass,InputFields,IgnoreNulls)

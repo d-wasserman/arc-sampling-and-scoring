@@ -334,7 +334,7 @@
 </div>
 <h2 class="gp" xmlns="">Syntax</h2>
 <div xmlns="">
-<p style="margin-top: -1.2em">ZStandarizeFields (Input_Feature_Class, Fields_to_Standarize) <br /><br />
+<p style="margin-top: -1.2em">ZStandarizeFields (Input_Feature_Class, Fields_to_Standarize, Ignore_Nulls) <br /><br />
 </p>
 <table width="100%" border="0" cellpadding="5">
 <tbody>
@@ -363,6 +363,12 @@
 <span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>Generally the fields are selected from the feature class to be converted into a numpy array, then into a pandas data frame, then back to structured numpy array to be joined based on the object ID. This tool assumes there is an object ID to use to join to. </SPAN></P></DIV></DIV></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
+<tr>
+<td class="info">Ignore_Nulls</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>Skips Rows with any Null Values in Selected Fields. If you want to process multiple fields preprocess the data ahead of time to deal with them appropropriately. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<td class="info" align="left">Boolean</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -382,7 +388,7 @@
 </div>
 <h2 class="gp" xmlns="">Use limitations</h2>
 <div class="gpItemInfo" xmlns="">
-<p><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This scripting tool only works in ArcGIS 10.4 and onwards because it uses the Pandas data manipulation library. It should work in ArcGIS Pro. </SPAN></P></DIV></DIV></p><br />
+<p><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This scripting tool only works in ArcGIS 10.4 and onwards because it uses the Pandas data manipulation library. It should work in ArcGIS Pro. </SPAN></P></DIV></DIV></DIV></p><br />
 </div>
 </body>
 </html>

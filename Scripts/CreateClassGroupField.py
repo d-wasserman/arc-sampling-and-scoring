@@ -252,8 +252,8 @@ def constructUniqueStringID(values,delimiter="."):
 
 @functionTime(reportTime=False)
 def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
-    """This ArcGIS function will create a unique class field based on a combination of input fields. It will create
-    one numeric group field and a text based field from the inputs."""
+    """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
+    join them back to the feature class using arcpy."""
     try:
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)

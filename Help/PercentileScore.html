@@ -334,7 +334,7 @@
 </div>
 <h2 class="gp" xmlns="">Syntax</h2>
 <div xmlns="">
-<p style="margin-top: -1.2em">PercentileFields (Input_Feature_Class, Fields_to_Score) <br /><br />
+<p style="margin-top: -1.2em">PercentileFields (Input_Feature_Class, Fields_to_Score, Ignore_Null_Values) <br /><br />
 </p>
 <table width="100%" border="0" cellpadding="5">
 <tbody>
@@ -361,6 +361,12 @@
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>These are the fields that percentiles scores added to the input feature class will be based.  </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Multiple Value</td>
+</tr>
+<tr>
+<td class="info">Ignore_Null_Values</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>Skips Rows with any Null Values in Selected Fields. If you want to process multiple fields preprocess the data ahead of time to deal with them appropropriately. </SPAN></P></DIV><DIV><DIV><P><SPAN /></P></DIV></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<td class="info" align="left">Boolean</td>
 </tr>
 </tbody>
 </table>
