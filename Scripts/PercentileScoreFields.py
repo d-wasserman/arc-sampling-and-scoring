@@ -27,8 +27,8 @@ import pandas as pd
 from scipy import stats
 # Define Inputs
 FeatureClass = arcpy.GetParameterAsText(0)
-InputFields = arcpy.GetParameterAsText(1)
-IgnoreNulls = arcpy.GetParameter(2)
+InputFields = arcpy.GetParameterAsText(1).split(";")
+IgnoreNulls = bool(arcpy.GetParameter(2))
 
 
 
@@ -114,10 +114,10 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
         return arcToolReport_Decorator(function)
 
 @arcToolReport
-def arcPrint(string, progressor_Bool=False):
+def arc_print(string, progressor_Bool=False):
     """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
     create a tool label."""
-    casted_string=str(string)
+    casted_string = str(string)
     if progressor_Bool:
         arcpy.SetProgressorLabel(casted_string)
         arcpy.AddMessage(casted_string)
@@ -126,16 +126,17 @@ def arcPrint(string, progressor_Bool=False):
         arcpy.AddMessage(casted_string)
         print(casted_string)
 
+
 @arcToolReport
 def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
     input fields."""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
     final_Fields = [OIDFieldName] + input_Fields
-    arcPrint("Converting feature class table to numpy array.", True)
+    arc_print("Converting feature class table to numpy array.", True)
     npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, skip_nulls, null_values)
     objectIDIndex = npArray[OIDFieldName]
-    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
+    arc_print("Converting feature class numpy array into pandas dataframe.", True)
     fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
     return fcDataFrame
 
@@ -150,35 +151,36 @@ def add_Percentile_Fields(in_fc, input_fields, ignore_nulls):
         desc = arcpy.Describe(in_fc)
         OIDFieldName=desc.OIDFieldName
         workspace= os.path.dirname(desc.catalogPath)
-        input_Fields_List=input_fields.split(';')
+        input_Fields_List=input_fields
         fcDataFrame=ArcGISTabletoDataFrame(in_fc,input_Fields_List,skip_nulls=ignore_nulls)
         finalColumnList=[]
         for column in fcDataFrame:
             try:
-                arcPrint("Creating percentile column for field {0}.".format(str(column)),True)
-                col_per_score = arcpy.ValidateFieldName("PerScore_"+column,workspace)
+                arc_print("Creating percentile column for field {0}.".format(str(column)), True)
+                col_per_score = arcpy.ValidateFieldName("Perc_"+column,workspace)
                 fcDataFrame[col_per_score] = stats.rankdata(fcDataFrame[column], "average")/len(fcDataFrame[column])
                 finalColumnList.append(col_per_score)
                 if col_per_score==column:
                     continue
                 del fcDataFrame[column]
             except Exception as e:
-                arcPrint("Could not process field {0}".format(str(column)))
+                arc_print("Could not process field {0}".format(str(column)))
                 print(e.args[0])
                 pass
         JoinField=arcpy.ValidateFieldName("DFIndexJoin",workspace)
         fcDataFrame[JoinField]=fcDataFrame.index
         finalColumnList.append(JoinField)
-        arcPrint("Exporting new percentile dataframe to structured numpy array.",True)
+        arc_print("Exporting new percentile dataframe to structured numpy array.", True)
         finalStandardArray= fcDataFrame.to_records()
-        arcPrint("Joining new percentile fields to feature class.",True)
+        arcPrint("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
+                 , True)
         arcpy.da.ExtendTable(in_fc,OIDFieldName,finalStandardArray,JoinField,append_only=False)
-        arcPrint("Script Completed Successfully.", True)
+        arc_print("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        arcPrint(arcpy.GetMessages(2))
+        arc_print(arcpy.GetMessages(2))
     except Exception as e:
-        arcPrint(e.args[0])
+        arc_print(e.args[0])
 
     # End do_analysis function
 

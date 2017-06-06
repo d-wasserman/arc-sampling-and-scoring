@@ -26,8 +26,8 @@ import numpy as np
 import pandas as pd
 # Define Inputs
 FeatureClass =arcpy.GetParameterAsText(0)
-InputFields= arcpy.GetParameterAsText(1)
-IgnoreNulls = arcpy.GetParameter(2)
+InputFields= arcpy.GetParameterAsText(1).split(";")
+IgnoreNulls = bool(arcpy.GetParameter(2))
 
 
 
@@ -149,7 +149,7 @@ def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
         desc = arcpy.Describe(in_fc)
         OIDFieldName=desc.OIDFieldName
         workspace= os.path.dirname(desc.catalogPath)
-        input_Fields_List=input_Fields.split(';')
+        input_Fields_List=input_Fields
         fcDataFrame=ArcGISTabletoDataFrame(in_fc,input_Fields_List,skip_nulls=ignore_nulls)
         finalColumnList=[]
         for column in fcDataFrame:
@@ -170,7 +170,8 @@ def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
         finalColumnList.append(JoinField)
         arcPrint("Exporting new standarized dataframe to structured numpy array.",True)
         finalStandardArray= fcDataFrame.to_records()
-        arcPrint("Joining new standarized fields to feature class.",True)
+        arcPrint("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
+                 ,True)
         arcpy.da.ExtendTable(in_fc,OIDFieldName,finalStandardArray,JoinField,append_only=False)
         arcPrint("Script Completed Successfully.", True)
 
