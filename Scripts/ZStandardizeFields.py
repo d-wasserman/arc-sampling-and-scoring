@@ -113,10 +113,10 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
         return arcToolReport_Decorator(function)
 
 @arcToolReport
-def arcPrint(string, progressor_Bool=False):
+def arc_print(string, progressor_Bool=False):
     """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
     create a tool label."""
-    casted_string=str(string)
+    casted_string = str(string)
     if progressor_Bool:
         arcpy.SetProgressorLabel(casted_string)
         arcpy.AddMessage(casted_string)
@@ -131,10 +131,10 @@ def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null
     input fields."""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
     final_Fields = [OIDFieldName] + input_Fields
-    arcPrint("Converting feature class table to numpy array.", True)
+    arc_print("Converting feature class table to numpy array.", True)
     npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, skip_nulls, null_values)
     objectIDIndex = npArray[OIDFieldName]
-    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
+    arc_print("Converting feature class numpy array into pandas dataframe.", True)
     fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
     return fcDataFrame
 
@@ -154,7 +154,7 @@ def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
         finalColumnList=[]
         for column in fcDataFrame:
             try:
-                arcPrint("Creating standarized column for field {0}.".format(str(column)),True)
+                arc_print("Creating standarized column for field {0}.".format(str(column)),True)
                 col_Standarized = arcpy.ValidateFieldName("Zscore_"+column,workspace)
                 fcDataFrame[col_Standarized] = (fcDataFrame[column] - fcDataFrame[column].mean())/fcDataFrame[column].std(ddof=0)
                 finalColumnList.append(col_Standarized)
@@ -162,23 +162,23 @@ def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
                     continue
                 del fcDataFrame[column]
             except Exception as e:
-                arcPrint("Could not process field {0}".format(str(column)))
+                arc_print("Could not process field {0}".format(str(column)))
                 print(e.args[0])
                 pass
         JoinField=arcpy.ValidateFieldName("DFIndexJoin",workspace)
         fcDataFrame[JoinField]=fcDataFrame.index
         finalColumnList.append(JoinField)
-        arcPrint("Exporting new standarized dataframe to structured numpy array.",True)
+        arc_print("Exporting new standarized dataframe to structured numpy array.",True)
         finalStandardArray= fcDataFrame.to_records()
-        arcPrint("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
+        arc_print("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
                  ,True)
         arcpy.da.ExtendTable(in_fc,OIDFieldName,finalStandardArray,JoinField,append_only=False)
-        arcPrint("Script Completed Successfully.", True)
+        arc_print("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        arcPrint(arcpy.GetMessages(2))
+        arc_print(arcpy.GetMessages(2))
     except Exception as e:
-        arcPrint(e.args[0])
+        arc_print(e.args[0])
 
     # End do_analysis function
 

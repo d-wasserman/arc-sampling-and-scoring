@@ -172,7 +172,7 @@ def add_Percentile_Fields(in_fc, input_fields, ignore_nulls):
         finalColumnList.append(JoinField)
         arc_print("Exporting new percentile dataframe to structured numpy array.", True)
         finalStandardArray= fcDataFrame.to_records()
-        arcPrint("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
+        arc_print("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
                  , True)
         arcpy.da.ExtendTable(in_fc,OIDFieldName,finalStandardArray,JoinField,append_only=False)
         arc_print("Script Completed Successfully.", True)
