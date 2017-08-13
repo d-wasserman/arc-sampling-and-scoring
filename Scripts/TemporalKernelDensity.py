@@ -27,25 +27,6 @@
 import arcpy, os, datetime, dateutil, re
 import numpy as np
 
-# Define Inputs
-# Temporal Params
-inFeatureClass = arcpy.GetParameterAsText(0)
-outWorkSpace = arcpy.GetParameterAsText(1)
-outputTableName = arcpy.GetParameterAsText(2)
-outputMosaicName = "TemporalMD" # To be finished...
-start_time_field = arcpy.GetParameterAsText(3)
-end_time_field = arcpy.GetParameterAsText(4)
-time_interval = arcpy.GetParameter(5)
-bin_start_time = arcpy.GetParameter(6)
-# Kernel Density Params
-population_field = arcpy.GetParameterAsText(7)  # Default to NONE
-cell_size = arcpy.GetParameter(8)  # Default to 50
-search_radius = arcpy.GetParameter(9)  # Required
-area_unit_scale_factor = arcpy.GetParameterAsText(10)  # Default "SQUARE_MILES"
-out_cell_values = arcpy.GetParameter(11)  # Default "DENSITY"
-# Optional Finish
-compactWorkspace = arcpy.GetParameter(12)
-
 
 # Function Definitions
 def funcReport(function=None, reportBool=False):
@@ -428,6 +409,24 @@ def temporal_kernel_density(inFeatureClass, outWorkSpace, outTemporalName, start
 
 # Main Script
 if __name__ == "__main__":
+    # Define Inputs
+    # Temporal Params
+    inFeatureClass = arcpy.GetParameterAsText(0)
+    outWorkSpace = arcpy.GetParameterAsText(1)
+    outputTableName = arcpy.GetParameterAsText(2)
+    outputMosaicName = "TemporalMD"  # To be finished...
+    start_time_field = arcpy.GetParameterAsText(3)
+    end_time_field = arcpy.GetParameterAsText(4)
+    time_interval = arcpy.GetParameter(5)
+    bin_start_time = arcpy.GetParameter(6)
+    # Kernel Density Params
+    population_field = arcpy.GetParameterAsText(7)  # Default to NONE
+    cell_size = arcpy.GetParameter(8)  # Default to 50
+    search_radius = arcpy.GetParameter(9)  # Required
+    area_unit_scale_factor = arcpy.GetParameterAsText(10)  # Default "SQUARE_MILES"
+    out_cell_values = arcpy.GetParameter(11)  # Default "DENSITY"
+    # Optional Finish
+    compactWorkspace = arcpy.GetParameter(12)
     temporal_kernel_density(inFeatureClass, outWorkSpace, outputTableName, start_time_field, end_time_field,
                             time_interval,
                             bin_start=bin_start_time, kernel_pop_field=population_field, kernel_cell_size=cell_size,

@@ -25,10 +25,6 @@ import os, arcpy, datetime
 import numpy as np
 import itertools
 
-# Define Inputs
-FeatureClass = arcpy.GetParameterAsText(0)  # r"C:"
-InputFields = arcpy.GetParameterAsText(1)  # "CBSA_POP;D5cri"
-BaseName = arcpy.GetParameterAsText(2)  # "GROUP"
 
 
 # Function Definitions
@@ -300,4 +296,8 @@ def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
+    # Define Inputs
+    FeatureClass = arcpy.GetParameterAsText(0)  # r"C:"
+    InputFields = arcpy.GetParameterAsText(1)  # "CBSA_POP;D5cri"
+    BaseName = arcpy.GetParameterAsText(2)  # "GROUP"
     create_Class_Group_Field(FeatureClass, InputFields, BaseName)

@@ -26,11 +26,6 @@ import os, arcpy, datetime
 import numpy as np
 import pandas as pd
 
-# Define Inputs
-FeatureClass = arcpy.GetParameterAsText(0)
-InputField = arcpy.GetParameterAsText(1)
-NewTextFieldName = arcpy.GetParameterAsText(2)
-TimeFormat = arcpy.GetParameterAsText(3)
 
 
 # Function Definitions
@@ -186,17 +181,15 @@ def CreateUniqueFieldName(field_name,in_table):
     return new_field_name
 
 @arcToolReport
-def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null_values=None):
+def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
     input fields."""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_Fields = [OIDFieldName] + input_Fields
-    arcPrint("Converting feature class table to numpy array.", True)
-    npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, skip_nulls, null_values)
-    objectIDIndex = npArray[OIDFieldName]
-    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
-    fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
-    return fcDataFrame
+    final_fields = [OIDFieldName] + input_fields
+    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
+    object_id_index = np_array[OIDFieldName]
+    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
+    return fc_dataframe
 
 
 @functionTime(reportTime=False)
@@ -213,7 +206,7 @@ def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
         arcPrint("Creating Pandas Dataframe from input table.")
         query= "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field),"is NOT","NULL")
-        fcDataFrame = ArcGISTabletoDataFrame(in_fc, [input_field, col_new_field],query)
+        fcDataFrame = arcgis_table_to_dataframe(in_fc, [input_field, col_new_field],query)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         fcDataFrame[JoinField] = fcDataFrame.index
         try:
@@ -250,4 +243,9 @@ def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
+    # Define Inputs
+    FeatureClass = arcpy.GetParameterAsText(0)
+    InputField = arcpy.GetParameterAsText(1)
+    NewTextFieldName = arcpy.GetParameterAsText(2)
+    TimeFormat = arcpy.GetParameterAsText(3)
     add_Time_String_Field(FeatureClass, InputField, NewTextFieldName, TimeFormat)

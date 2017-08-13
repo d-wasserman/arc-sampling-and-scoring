@@ -25,17 +25,6 @@ import os, arcpy, datetime
 import numpy as np
 import pandas as pd
 
-# Define Inputs
-FeatureClass = arcpy.GetParameterAsText(0)
-InputField = arcpy.GetParameterAsText(1)
-NewTextFieldName = arcpy.GetParameterAsText(2)
-RoundYear = arcpy.GetParameter(3)
-RoundMonth = arcpy.GetParameter(4)
-RoundDay = arcpy.GetParameter(5)
-RoundHour = arcpy.GetParameter(6)
-RoundMinute = arcpy.GetParameter(7)
-RoundSecond = arcpy.GetParameter(8)
-
 
 # Function Definitions
 
@@ -43,6 +32,7 @@ def funcReport(function=None, reportBool=False):
     """This decorator function is designed to be used as a wrapper with other functions to enable basic try and except
      reporting (if function fails it will report the name of the function that failed and its arguments. If a report
       boolean is true the function will report inputs and outputs of a function.-David Wasserman"""
+
     def funcReport_Decorator(function):
         def funcWrapper(*args, **kwargs):
             try:
@@ -119,8 +109,8 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
                 return funcResult
             except Exception as e:
                 arcpy.AddMessage(
-                        "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__),
-                                                                                        str(args)))
+                    "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__),
+                                                                                    str(args)))
                 print(
                     "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
                 print(e.args[0])
@@ -140,7 +130,7 @@ def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=Fal
 def arcPrint(string, progressor_Bool=False):
     """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
     create a tool label."""
-    casted_string=str(string)
+    casted_string = str(string)
     if progressor_Bool:
         arcpy.SetProgressorLabel(casted_string)
         arcpy.AddMessage(casted_string)
@@ -148,6 +138,7 @@ def arcPrint(string, progressor_Bool=False):
     else:
         arcpy.AddMessage(casted_string)
         print(casted_string)
+
 
 @arcToolReport()
 def FieldExist(featureclass, fieldname):
@@ -192,77 +183,77 @@ def CreateUniqueFieldName(field_name, in_table):
 
 
 @arcToolReport
-def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null_values=None):
+def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
     input fields."""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_Fields = [OIDFieldName] + input_Fields
-    arcPrint("Converting feature class table to numpy array.", True)
-    npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, skip_nulls, null_values)
-    objectIDIndex = npArray[OIDFieldName]
-    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
-    fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
-    return fcDataFrame
+    final_fields = [OIDFieldName] + input_fields
+    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
+    object_id_index = np_array[OIDFieldName]
+    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
+    return fc_dataframe
+
 
 @arcToolReport
 def RoundDownByValueIfNotTarget(value, alternative, target=None):
     """If value is not target (depending on parameters), return alternative."""
     if value is not target or value != target:
-        return (alternative//value)*value
+        return (alternative // value) * value
     else:
         return alternative
 
+
 @arcToolReport
-def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, microsecond=-1,original_dt_target=-1):
+def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, microsecond=-1, original_dt_target=-1):
     """Will round a new date time to the year increment within an apply function based on the type of object present.
     The rounded date time will take the smallest unit not to be the dt_target, and make all units smaller 0 by integer
     dividing by a large number. Starts with asking for forgiveness rather than permission to get original object
     properties, then uses isinstance to the appropriate datetime object to return."""
-    time_list=[year,month,day, hour, minute, second,microsecond]
-    counter=0
-    index=0
+    time_list = [year, month, day, hour, minute, second, microsecond]
+    counter = 0
+    index = 0
     for time in time_list:
-        counter+=1
-        if time!=original_dt_target:
-            index=counter
-    if index==0:
+        counter += 1
+        if time != original_dt_target:
+            index = counter
+    if index == 0:
         pass
-    elif index==1:
-        month,day,hour,minute,second,microsecond=1000000,1000000,1000000,1000000,1000000,1000000
-    elif index==2:
-        day,hour,minute,second,microsecond=1000000,1000000,1000000,1000000,1000000
-    elif index==3:
-        hour,minute,second,microsecond=1000000,1000000,1000000,1000000
-    elif index==4:
-        minute,second,microsecond=1000000,1000000,1000000
-    elif index==5:
-        second,microsecond=1000000,1000000
-    elif index==6:
-        microsecond=1000000
+    elif index == 1:
+        month, day, hour, minute, second, microsecond = 1000000, 1000000, 1000000, 1000000, 1000000, 1000000
+    elif index == 2:
+        day, hour, minute, second, microsecond = 1000000, 1000000, 1000000, 1000000, 1000000
+    elif index == 3:
+        hour, minute, second, microsecond = 1000000, 1000000, 1000000, 1000000
+    elif index == 4:
+        minute, second, microsecond = 1000000, 1000000, 1000000
+    elif index == 5:
+        second, microsecond = 1000000, 1000000
+    elif index == 6:
+        microsecond = 1000000
     else:
         pass
     try:
-        new_year=RoundDownByValueIfNotTarget(year, datetime_obj.year, original_dt_target)
-        new_month=RoundDownByValueIfNotTarget(month, datetime_obj.month, original_dt_target)
-        new_day=RoundDownByValueIfNotTarget(day, datetime_obj.day, original_dt_target)
+        new_year = RoundDownByValueIfNotTarget(year, datetime_obj.year, original_dt_target)
+        new_month = RoundDownByValueIfNotTarget(month, datetime_obj.month, original_dt_target)
+        new_day = RoundDownByValueIfNotTarget(day, datetime_obj.day, original_dt_target)
     except:
         pass
     try:
-        new_hour=RoundDownByValueIfNotTarget(hour, datetime_obj.hour, original_dt_target)
-        new_minute=RoundDownByValueIfNotTarget(minute, datetime_obj.minute, original_dt_target)
-        new_second=RoundDownByValueIfNotTarget(second, datetime_obj.second, original_dt_target)
-        new_microsecond=RoundDownByValueIfNotTarget(microsecond, datetime_obj.microsecond, original_dt_target)
+        new_hour = RoundDownByValueIfNotTarget(hour, datetime_obj.hour, original_dt_target)
+        new_minute = RoundDownByValueIfNotTarget(minute, datetime_obj.minute, original_dt_target)
+        new_second = RoundDownByValueIfNotTarget(second, datetime_obj.second, original_dt_target)
+        new_microsecond = RoundDownByValueIfNotTarget(microsecond, datetime_obj.microsecond, original_dt_target)
     except:
         pass
     try:
-        if isinstance(datetime_obj,datetime.datetime):
+        if isinstance(datetime_obj, datetime.datetime):
             return datetime.datetime(year=new_year, month=new_month, day=new_day, hour=new_hour, minute=new_minute,
-                                     second=new_second,microsecond=new_microsecond)
-        elif isinstance(datetime_obj,datetime.date):
+                                     second=new_second, microsecond=new_microsecond)
+        elif isinstance(datetime_obj, datetime.date):
             return datetime.date(year=new_year, month=new_month, day=new_day)
-        elif isinstance(datetime_obj,datetime.time):
-            return datetime.time(hour=new_hour, minute=new_minute, second=new_second,microsecond=new_microsecond)
-        else:# If it is something else,send back max datetime.
+        elif isinstance(datetime_obj, datetime.time):
+            return datetime.time(hour=new_hour, minute=new_minute, second=new_second, microsecond=new_microsecond)
+        else:  # If it is something else,send back max datetime.
             return datetime.date.min
     except:
         return datetime.date.min
@@ -270,33 +261,34 @@ def round_new_datetime(datetime_obj, year, month, day, hour, minute, second, mic
 
 @functionTime(reportTime=False)
 def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
-                       set_minute=None, set_second=None):
+                    set_minute=None, set_second=None):
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the
      passed date-time attributes are set to a target."""
     try:
         # arc_print(pd.__version__) Does not have dt lib.
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
-        workspace= os.path.dirname(desc.catalogPath)
+        workspace = os.path.dirname(desc.catalogPath)
         col_new_field = arcpy.ValidateFieldName(CreateUniqueFieldName(new_field_name, in_fc), workspace)
         AddNewField(in_fc, col_new_field, "DATE")
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
         arcPrint("Creating Pandas Dataframe from input table.")
-        query= "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field),"is NOT","NULL")
-        fcDataFrame = ArcGISTabletoDataFrame(in_fc, [input_field, col_new_field],query)
+        query = "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field), "is NOT", "NULL")
+        fcDataFrame = arcgis_table_to_dataframe(in_fc, [input_field, col_new_field], query)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         fcDataFrame[JoinField] = fcDataFrame.index
         try:
             arcPrint("Creating new date-time column based on field {0}.".format(str(input_field)), True)
-            fcDataFrame[col_new_field]=fcDataFrame[input_field].apply(
-                lambda dt: round_new_datetime(dt,set_year,set_month,set_day,set_hour,set_minute,set_second)).astype(datetime.datetime)
+            fcDataFrame[col_new_field] = fcDataFrame[input_field].apply(
+                lambda dt: round_new_datetime(dt, set_year, set_month, set_day, set_hour, set_minute,
+                                              set_second)).astype(datetime.datetime)
             del fcDataFrame[input_field]
         except Exception as e:
             del fcDataFrame[input_field]
             arcPrint(
-                    "Could not process datetime field. "
-                    "Check that datetime is a year appropriate to your python version and that "
-                    "the time format string is appropriate.")
+                "Could not process datetime field. "
+                "Check that datetime is a year appropriate to your python version and that "
+                "the time format string is appropriate.")
             arcPrint(e.args[0])
             pass
 
@@ -321,5 +313,15 @@ def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
+    # Define Inputs
+    FeatureClass = arcpy.GetParameterAsText(0)
+    InputField = arcpy.GetParameterAsText(1)
+    NewTextFieldName = arcpy.GetParameterAsText(2)
+    RoundYear = arcpy.GetParameter(3)
+    RoundMonth = arcpy.GetParameter(4)
+    RoundDay = arcpy.GetParameter(5)
+    RoundHour = arcpy.GetParameter(6)
+    RoundMinute = arcpy.GetParameter(7)
+    RoundSecond = arcpy.GetParameter(8)
     round_date_time(FeatureClass, InputField, NewTextFieldName, RoundYear, RoundMonth, RoundDay, RoundHour, RoundMinute,
                     RoundSecond)

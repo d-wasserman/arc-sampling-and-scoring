@@ -24,10 +24,7 @@
 import os, arcpy, datetime
 import numpy as np
 import pandas as pd
-# Define Inputs
-FeatureClass =arcpy.GetParameterAsText(0)
-InputFields= arcpy.GetParameterAsText(1).split(";")
-IgnoreNulls = bool(arcpy.GetParameter(2))
+
 
 
 
@@ -126,18 +123,15 @@ def arc_print(string, progressor_Bool=False):
         print(casted_string)
 
 @arcToolReport
-def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null_values=None):
+def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
     input fields."""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_Fields = [OIDFieldName] + input_Fields
-    arc_print("Converting feature class table to numpy array.", True)
-    npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, skip_nulls, null_values)
-    objectIDIndex = npArray[OIDFieldName]
-    arc_print("Converting feature class numpy array into pandas dataframe.", True)
-    fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
-    return fcDataFrame
-
+    final_fields = [OIDFieldName] + input_fields
+    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
+    object_id_index = np_array[OIDFieldName]
+    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
+    return fc_dataframe
 
 
 @functionTime(reportTime=False)
@@ -150,7 +144,7 @@ def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
         OIDFieldName=desc.OIDFieldName
         workspace= os.path.dirname(desc.catalogPath)
         input_Fields_List=input_Fields
-        fcDataFrame=ArcGISTabletoDataFrame(in_fc,input_Fields_List,skip_nulls=ignore_nulls)
+        fcDataFrame=arcgis_table_to_dataframe(in_fc,input_Fields_List,skip_nulls=ignore_nulls)
         finalColumnList=[]
         for column in fcDataFrame:
             try:
@@ -187,4 +181,8 @@ def add_Standarized_Fields(in_fc, input_Fields,ignore_nulls=False):
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
+    # Define Inputs
+    FeatureClass = arcpy.GetParameterAsText(0)
+    InputFields = arcpy.GetParameterAsText(1).split(";")
+    IgnoreNulls = bool(arcpy.GetParameter(2))
     add_Standarized_Fields(FeatureClass,InputFields,IgnoreNulls)

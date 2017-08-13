@@ -27,18 +27,6 @@
 import arcpy, os, datetime, dateutil, re
 import numpy as np
 
-# Define Inputs
-# Temporal Params
-inFeatureClass = arcpy.GetParameterAsText(0)
-outFeatureClass = arcpy.GetParameterAsText(1)
-start_time_field = arcpy.GetParameterAsText(2)
-end_time_field = arcpy.GetParameterAsText(3)
-time_interval = arcpy.GetParameter(4)
-bin_start_time = arcpy.GetParameter(5)
-# Mean Center Params
-case_field = arcpy.GetParameterAsText(6)
-weight_field = arcpy.GetParameterAsText(7)
-dimension_field = arcpy.GetParameterAsText(8)
 
 
 # Function Definitions
@@ -432,5 +420,17 @@ def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, 
 
 # Main Script
 if __name__ == "__main__":
+    # Define Inputs
+    # Temporal Params
+    inFeatureClass = arcpy.GetParameterAsText(0)
+    outFeatureClass = arcpy.GetParameterAsText(1)
+    start_time_field = arcpy.GetParameterAsText(2)
+    end_time_field = arcpy.GetParameterAsText(3)
+    time_interval = arcpy.GetParameter(4)
+    bin_start_time = arcpy.GetParameter(5)
+    # Mean Center Params
+    case_field = arcpy.GetParameterAsText(6)
+    weight_field = arcpy.GetParameterAsText(7)
+    dimension_field = arcpy.GetParameterAsText(8)
     temporal_mean_center(inFeatureClass, outFeatureClass, start_time_field, end_time_field,
                          time_interval, bin_start_time, weight_field, case_field, dimension_field)
