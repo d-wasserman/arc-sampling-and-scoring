@@ -26,16 +26,6 @@
 import arcpy, os, datetime, dateutil, re
 import numpy as np
 
-# Define Inputs
-inFeatureClass = arcpy.GetParameterAsText(0)
-outWorkSpace = arcpy.GetParameterAsText(1)
-start_time_field = arcpy.GetParameterAsText(2)
-end_time_field = arcpy.GetParameterAsText(3)
-time_interval = arcpy.GetParameter(4)
-bin_start_time= arcpy.GetParameter(5)
-compactWorkspace = arcpy.GetParameter(5)
-
-
 # Function Definitions
 def funcReport(function=None, reportBool=False):
     """This decorator function is designed to be used as a wrapper with other functions to enable basic try and except
@@ -322,5 +312,13 @@ def do_analysis(inFeatureClass, outWorkSpace, start_time, end_time, time_interva
 
 # Main Script
 if __name__ == "__main__":
+    # Define Inputs
+    inFeatureClass = arcpy.GetParameterAsText(0)
+    outWorkSpace = arcpy.GetParameterAsText(1)
+    start_time_field = arcpy.GetParameterAsText(2)
+    end_time_field = arcpy.GetParameterAsText(3)
+    time_interval = arcpy.GetParameter(4)
+    bin_start_time = arcpy.GetParameter(5)
+    compactWorkspace = arcpy.GetParameter(5)
     do_analysis(inFeatureClass, outWorkSpace, start_time_field, end_time_field, time_interval,bin_start_time,
                 compactWorkspace)

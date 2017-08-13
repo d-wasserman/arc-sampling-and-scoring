@@ -25,18 +25,6 @@ import os, arcpy, datetime
 import numpy as np
 import pandas as pd
 
-# Define Inputs
-FeatureClass = arcpy.GetParameterAsText(0)
-InputField = arcpy.GetParameterAsText(1)
-NewTextFieldName = arcpy.GetParameterAsText(2)
-SetYear = arcpy.GetParameter(3)
-SetMonth = arcpy.GetParameter(4)
-SetDay = arcpy.GetParameter(5)
-SetHour = arcpy.GetParameter(6)
-SetMinute = arcpy.GetParameter(7)
-SetSecond = arcpy.GetParameter(8)
-SetMicroSecond=arcpy.GetParameter(9)
-
 # Function Definitions
 def funcReport(function=None, reportBool=False):
     """This decorator function is designed to be used as a wrapper with other functions to enable basic try and except
@@ -193,17 +181,15 @@ def CreateUniqueFieldName(field_name, in_table):
 
 
 @arcToolReport
-def ArcGISTabletoDataFrame(in_fc, input_Fields, query="", skip_nulls=False, null_values=None):
+def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
     input fields."""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_Fields = [OIDFieldName] + input_Fields
-    arcPrint("Converting feature class table to numpy array.", True)
-    npArray = arcpy.da.TableToNumPyArray(in_fc, final_Fields, query, skip_nulls, null_values)
-    objectIDIndex = npArray[OIDFieldName]
-    arcPrint("Converting feature class numpy array into pandas dataframe.", True)
-    fcDataFrame = pd.DataFrame(npArray, index=objectIDIndex, columns=input_Fields)
-    return fcDataFrame
+    final_fields = [OIDFieldName] + input_fields
+    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
+    object_id_index = np_array[OIDFieldName]
+    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
+    return fc_dataframe
 
 
 @arcToolReport
@@ -301,5 +287,16 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
 # as a geoprocessing script tool, or as a module imported in
 # another script
 if __name__ == '__main__':
+    # Define Inputs
+    FeatureClass = arcpy.GetParameterAsText(0)
+    InputField = arcpy.GetParameterAsText(1)
+    NewTextFieldName = arcpy.GetParameterAsText(2)
+    SetYear = arcpy.GetParameter(3)
+    SetMonth = arcpy.GetParameter(4)
+    SetDay = arcpy.GetParameter(5)
+    SetHour = arcpy.GetParameter(6)
+    SetMinute = arcpy.GetParameter(7)
+    SetSecond = arcpy.GetParameter(8)
+    SetMicroSecond = arcpy.GetParameter(9)
     truncate_date_time(FeatureClass, InputField, NewTextFieldName, SetYear, SetMonth, SetDay, SetHour, SetMinute,
                           SetSecond,SetMicroSecond)
