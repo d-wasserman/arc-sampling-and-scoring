@@ -248,7 +248,7 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
         arcPrint("Creating Pandas Dataframe from input table.")
         query= "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field),"is NOT","NULL")
-        fcDataFrame = ArcGISTabletoDataFrame(in_fc, [input_field, col_new_field],query)
+        fcDataFrame = arcgis_table_to_dataframe(in_fc, [input_field, col_new_field],query)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         fcDataFrame[JoinField] = fcDataFrame.index
         try:
