@@ -24,7 +24,7 @@ The goal of this script is to add new fields with standarized Z Scores for every
 <tr>
 <td class="info">Input_Feature_Class</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>This is the selected input feature class that will have new </span><a href="http://pro.arcgis.com/en/pro-app/tool-reference/spatial-statistics/what-is-a-z-score-what-is-a-p-value.htm"><span>fields with Z scores calculated </span></a><span>joined to it. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>This is the selected input feature class that will have new </span><a href="http://pro.arcgis.com/en/pro-app/tool-reference/spatial-statistics/what-is-a-z-score-what-is-a-p-value.htm"><span>fields with Z scores calculated </span></a><span>and joined to it. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
 <span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><div><p><span>The feature class uses the </span><a href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><span>ExtendTable function </span></a><span>used from the DA module of arcpy to join a modified structured numpy array with column-wise calculated Z scores joined to it. </span></p></div></div></div></td>
 <td class="info" align="left">Feature Layer</td>
 </tr>
@@ -84,6 +84,106 @@ The goal of this script is to add new fields with standarized Z Scores for every
  </table>
  </div>
 
+# PercentileFields Summary
+This 10.4 ArcGIS scripting tool is designed to take selected fields and create an added field with a percentile score for each one of the selected fields. 
+# Usage
+The goal of this script is to add new fields with percentile scores for every field selected. The percentile scores
+are based on the values of each column, so they will change depending on the extent of the current data set. 
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input_Feature_Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>This is the selected input feature class that will have new fields with percentiles calculated and joined to it. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><div><p><span>The feature class uses the </span><a href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><span>ExtendTable function </span></a><span>used from the DA module of arcpy to join a modified structured numpy array with column-wise calculated Z scores joined to it. </span></p></div></div></div></td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Percentile_Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the fields that percentiles scores added to the input feature class will be based. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span>Generally the fields are selected from the feature class to be converted into a numpy array, then into a pandas data frame, then back to structured numpy array to be joined based on the object ID. This tool assumes there is an object ID to use to join to. </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+</tbody>
+</table>
+
+# Density To Vector Summary
+This script is intended to help aid a density based network/vector analysis process by computing KDEs, associating
+them with a target vector file, and computing percentile scores of non-zero/null density scores. This helps with
+cartography and analysis on networks and other vector data. 
+
+# Usage
+The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step.  
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input_Feature_Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>Feature class of point values that will be used to compute kernel densities. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</tr>
+<tr>
+<td class="info">Weight_Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Density feature class fields that are used to both
+weight and filter kernel density estimates. Each kernel density is computed on non-null values, but a weight of 0 will still be treated as non-existent data. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</tr>
+<tr>
+<td class="info">Input_Target_Vector</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
+densities will be associated with. Zero values will be turned into nulls. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</tr>
+<tr>
+<td class="info">Add_Percentiles (Optional)</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, this will add a percentile calculation for every weight field. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</tr>
+<td class="info">Input_Target_Vector</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
+densities will be associated with. Zero values will be turned into nulls. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</tr>
+<tr>
+<td class="info">Cell_Size,Search_Radius, and Unit Area Factor</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the KDE control fields that the tool will use to compute the kernel densities of all the weighted elements in the input feature class. You can find out more information on the Kernel Density tools documentation. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</tr>
+</tbody>
+</table>
+ 
 # ArcTime TBX
 
 # TruncateDatetime
