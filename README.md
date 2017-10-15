@@ -148,6 +148,7 @@ The goal of this script is to assist in creating clean density maps using networ
 <td class="info">Input_Feature_Class</td>
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>Feature class of point values that will be used to compute kernel densities. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Feature Class</td>
 </tr>
 <tr>
 <td class="info">Weight_Fields</td>
@@ -155,6 +156,7 @@ The goal of this script is to assist in creating clean density maps using networ
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Density feature class fields that are used to both
 weight and filter kernel density estimates. Each kernel density is computed on non-null values, but a weight of 0 will still be treated as non-existent data. 
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Fields</td>
 </tr>
 <tr>
 <td class="info">Input_Target_Vector</td>
@@ -162,24 +164,21 @@ weight and filter kernel density estimates. Each kernel density is computed on n
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
 densities will be associated with. Zero values will be turned into nulls. 
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Feature Class</td>
 </tr>
 <tr>
 <td class="info">Add_Percentiles (Optional)</td>
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, this will add a percentile calculation for every weight field. 
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-</tr>
-<td class="info">Input_Target_Vector</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
-densities will be associated with. Zero values will be turned into nulls. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Boolean</td>
 </tr>
 <tr>
 <td class="info">Cell_Size,Search_Radius, and Unit Area Factor</td>
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the KDE control fields that the tool will use to compute the kernel densities of all the weighted elements in the input feature class. You can find out more information on the Kernel Density tools documentation. 
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Multiple Values</td>
 </tr>
 </tbody>
 </table>
