@@ -194,7 +194,7 @@ def construct_sql_equality_query(fieldName, value, dataSource, equalityOperator=
             return "{0} {1} {2}".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
 
 
-def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=True, cell_size=500,
+def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=True, field_edit="", cell_size=500,
                       search_radius=800, area_unit="SQUARE_MILES"):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
      percentile bool is true, percentile scores are added along side each density. """
@@ -219,18 +219,18 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
             output_kde = arcpy.sa.KernelDensity(in_fc, str(field), cell_size, search_radius, area_unit)
             arcpy.sa.ExtractValuesToPoints(temp_sample_points, output_kde, temp_out_sample, True)
             raw_sample_df = arcgis_table_to_dataframe(temp_out_sample, ["RASTERVALU"])
-            new_field_name = "DN_" + str(field)
+            new_field_name = "DN_" + str(field_edit) + str(field)
             raw_sample_df[new_field_name] = raw_sample_df["RASTERVALU"]
-            raw_sample_df[new_field_name].replace([0],np.NaN,inplace=True)
+            raw_sample_df[new_field_name].replace([0], np.NaN, inplace=True)
             if percentile_bool:
-                new_percentile_field = "Per_" + str(field)
+                new_percentile_field = "Per_" + str(field_edit) + str(field)
                 raw_sample_df[new_percentile_field] = raw_sample_df[new_field_name].rank(pct=True)
             field_list = [new_field_name, new_percentile_field] if percentile_bool else [new_field_name]
             if final_df is not None:
                 final_df = pd.concat([final_df, raw_sample_df[field_list]], axis=1)
             else:
                 raw_sample_df[join_field] = raw_sample_df.index
-                final_df = raw_sample_df[[join_field]+field_list]
+                final_df = raw_sample_df[[join_field] + field_list]
         arc_print("Extending density fields to table...")
         final_df = validate_df_names(final_df, work_space)
         fin_records = final_df.to_records()
@@ -254,4 +254,9 @@ if __name__ == '__main__':
     weighted_fields = arcpy.GetParameter(1)
     input_network = arcpy.GetParameterAsText(2)
     percentile_bool = arcpy.GetParameter(3)
-    density_to_vector(input_feature_class, weighted_fields, input_network, bool(percentile_bool))
+    field_edit = arcpy.GetParameterAsText(4)
+    cell_size = arcpy.GetParameter(5)
+    search_radius = arcpy.GetParameter(6)
+    area_unit_factor = arcpy.GetParameter(7)
+    density_to_vector(input_feature_class, weighted_fields, input_network, bool(percentile_bool), field_edit, cell_size,
+                      search_radius, area_unit_factor)
