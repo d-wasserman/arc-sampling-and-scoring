@@ -183,7 +183,7 @@ if __name__ == '__main__':
     output_feature_Class = arcpy.GetParameterAsText(2)
     prepended_field_name = arcpy.GetParameterAsText(3)
     join_operation = arcpy.GetParameterAsText(4)
-    join_type = bool(arcpy.GetParameter(5))
+    join_type = "KEEP_ALL" if bool(arcpy.GetParameter(5)) else "KEEP_COMMON"
     match_option = str(arcpy.GetParameterAsText(6)).strip()
     search_radius = arcpy.GetParameter(7)
     # Simplify processing by associating input lists to target merge rules
