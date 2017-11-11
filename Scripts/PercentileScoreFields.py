@@ -137,7 +137,7 @@ def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, n
 
 
 @functionTime(reportTime=False)
-def add_Percentile_Fields(in_fc, input_fields, ignore_nulls):
+def add_Percentile_Fields(in_fc, input_fields, ignore_nulls=True):
     """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy."""
     try:
@@ -146,26 +146,31 @@ def add_Percentile_Fields(in_fc, input_fields, ignore_nulls):
         OIDFieldName=desc.OIDFieldName
         workspace= os.path.dirname(desc.catalogPath)
         input_Fields_List=input_fields
-        fcDataFrame=arcgis_table_to_dataframe(in_fc,input_Fields_List,skip_nulls=ignore_nulls)
         finalColumnList=[]
-        for column in fcDataFrame:
+        scored_df=None
+        for column in input_Fields_List:
             try:
+                field_series=arcgis_table_to_dataframe(in_fc,[column],skip_nulls=ignore_nulls)
+                arc_print(len(field_series))
                 arc_print("Creating percentile column for field {0}.".format(str(column)), True)
                 col_per_score = arcpy.ValidateFieldName("Perc_"+column,workspace)
-                fcDataFrame[col_per_score] = stats.rankdata(fcDataFrame[column], "average")/len(fcDataFrame[column])
+                field_series[col_per_score] = stats.rankdata(field_series, "average")/len(field_series)
                 finalColumnList.append(col_per_score)
-                if col_per_score==column:
-                    continue
-                del fcDataFrame[column]
+                if col_per_score!=column:
+                    del field_series[column]
+                if scored_df is None:
+                    scored_df=field_series
+                else:
+                    scored_df=pd.merge(scored_df,field_series,how="outer",left_index=True,right_index=True)
             except Exception as e:
                 arc_print("Could not process field {0}".format(str(column)))
-                print(e.args[0])
+                arc_print(e.args[0])
                 pass
         JoinField=arcpy.ValidateFieldName("DFIndexJoin",workspace)
-        fcDataFrame[JoinField]=fcDataFrame.index
+        scored_df[JoinField]=scored_df.index
         finalColumnList.append(JoinField)
         arc_print("Exporting new percentile dataframe to structured numpy array.", True)
-        finalStandardArray= fcDataFrame.to_records()
+        finalStandardArray= scored_df.to_records()
         arc_print("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
                  , True)
         arcpy.da.ExtendTable(in_fc,OIDFieldName,finalStandardArray,JoinField,append_only=False)
