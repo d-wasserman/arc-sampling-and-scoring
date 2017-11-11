@@ -151,7 +151,6 @@ def add_Percentile_Fields(in_fc, input_fields, ignore_nulls=True):
         for column in input_Fields_List:
             try:
                 field_series=arcgis_table_to_dataframe(in_fc,[column],skip_nulls=ignore_nulls)
-                arc_print(len(field_series))
                 arc_print("Creating percentile column for field {0}.".format(str(column)), True)
                 col_per_score = arcpy.ValidateFieldName("Perc_"+column,workspace)
                 field_series[col_per_score] = stats.rankdata(field_series, "average")/len(field_series)
