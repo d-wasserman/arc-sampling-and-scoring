@@ -22,165 +22,61 @@
 # --------------------------------
 # Import Modules
 import os, arcpy, datetime
+import SharedArcNumericalLib as san
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 
-
-
 # Function Definitions
-def funcReport(function=None,reportBool=False):
-    """This decorator function is designed to be used as a wrapper with other functions to enable basic try and except
-     reporting (if function fails it will report the name of the function that failed and its arguments. If a report
-      boolean is true the function will report inputs and outputs of a function.-David Wasserman"""
-    def funcReport_Decorator(function):
-        def funcWrapper(*args, **kwargs):
-            try:
-                funcResult = function(*args, **kwargs)
-                if reportBool:
-                    print("Function:{0}".format(str(function.__name__)))
-                    print("     Input(s):{0}".format(str(args)))
-                    print("     Ouput(s):{0}".format(str(funcResult)))
-                return funcResult
-            except Exception as e:
-                print("{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
-                print(e.args[0])
-        return funcWrapper
-    if not function:  # User passed in a bool argument
-        def waiting_for_function(function):
-            return funcReport_Decorator(function)
-        return waiting_for_function
-    else:
-        return funcReport_Decorator(function)
 
-def functionTime(function=None,reportTime=True):
-    """ If a report time boolean is true, it will print the datetime before and after function run. Includes
-    import with a rare namespace.-David Wasserman"""
-    def funcReport_Decorator(function):
-        def funcWrapper(*args, **kwargs):
-            if reportTime:
-                try:
-                    #from datetime import datetime as functionDateTime_nsx978 #Optional, but removed
-                    print("{0} Function Start:{1}".format(str(function.__name__),str(datetime.datetime.now())))
-                except:
-                    pass
-            funcResult = function(*args, **kwargs)
-            if reportTime:
-                try:
-                    print("{0} Function End:{1}".format(str(function.__name__),str(datetime.datetime.now())))
-                except:
-                    pass
-            return funcResult
-        return funcWrapper
-    if not function:  # User passed in a bool argument
-        def waiting_for_function(function):
-            return funcReport_Decorator(function)
-        return waiting_for_function
-    else:
-        return funcReport_Decorator(function)
-
-def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=False):
-    """This decorator function is designed to be used as a wrapper with other GIS functions to enable basic try and except
-     reporting (if function fails it will report the name of the function that failed and its arguments. If a report
-      boolean is true the function will report inputs and outputs of a function.-David Wasserman"""
-    def arcToolReport_Decorator(function):
-        def funcWrapper(*args, **kwargs):
-            try:
-                funcResult = function(*args, **kwargs)
-                if arcToolMessageBool:
-                    arcpy.AddMessage("Function:{0}".format(str(function.__name__)))
-                    arcpy.AddMessage("     Input(s):{0}".format(str(args)))
-                    arcpy.AddMessage("     Ouput(s):{0}".format(str(funcResult)))
-                if arcProgressorBool:
-                    arcpy.SetProgressorLabel("Function:{0}".format(str(function.__name__)))
-                    arcpy.SetProgressorLabel("     Input(s):{0}".format(str(args)))
-                    arcpy.SetProgressorLabel("     Ouput(s):{0}".format(str(funcResult)))
-                return funcResult
-            except Exception as e:
-                arcpy.AddMessage(
-                    "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
-                print("{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
-                print(e.args[0])
-        return funcWrapper
-    if not function:  # User passed in a bool argument
-        def waiting_for_function(function):
-            return  arcToolReport_Decorator(function)
-        return waiting_for_function
-    else:
-        return arcToolReport_Decorator(function)
-
-@arcToolReport
-def arc_print(string, progressor_Bool=False):
-    """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
-    create a tool label."""
-    casted_string = str(string)
-    if progressor_Bool:
-        arcpy.SetProgressorLabel(casted_string)
-        arcpy.AddMessage(casted_string)
-        print(casted_string)
-    else:
-        arcpy.AddMessage(casted_string)
-        print(casted_string)
-
-
-@arcToolReport
-def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
-    """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
-    input fields."""
-    OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_fields = [OIDFieldName] + input_fields
-    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
-    object_id_index = np_array[OIDFieldName]
-    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
-    return fc_dataframe
-
-
-@functionTime(reportTime=False)
+@san.functionTime(reportTime=False)
 def add_Percentile_Fields(in_fc, input_fields, ignore_nulls=True):
     """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy."""
     try:
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
-        OIDFieldName=desc.OIDFieldName
-        workspace= os.path.dirname(desc.catalogPath)
-        input_Fields_List=input_fields
-        finalColumnList=[]
-        scored_df=None
+        OIDFieldName = desc.OIDFieldName
+        workspace = os.path.dirname(desc.catalogPath)
+        input_Fields_List = input_fields
+        finalColumnList = []
+        scored_df = None
         for column in input_Fields_List:
             try:
-                field_series=arcgis_table_to_dataframe(in_fc,[column],skip_nulls=ignore_nulls)
-                arc_print("Creating percentile column for field {0}.".format(str(column)), True)
-                col_per_score = arcpy.ValidateFieldName("Perc_"+column,workspace)
-                field_series[col_per_score] = stats.rankdata(field_series, "average")/len(field_series)
+                field_series = san.arcgis_table_to_dataframe(in_fc, [column], skip_nulls=ignore_nulls)
+                san.arc_print("Creating percentile column for field {0}.".format(str(column)), True)
+                col_per_score = arcpy.ValidateFieldName("Perc_" + column, workspace)
+                field_series[col_per_score] = stats.rankdata(field_series, "average") / len(field_series)
                 finalColumnList.append(col_per_score)
-                if col_per_score!=column:
+                if col_per_score != column:
                     del field_series[column]
                 if scored_df is None:
-                    scored_df=field_series
+                    scored_df = field_series
                 else:
-                    scored_df=pd.merge(scored_df,field_series,how="outer",left_index=True,right_index=True)
+                    scored_df = pd.merge(scored_df, field_series, how="outer", left_index=True, right_index=True)
             except Exception as e:
-                arc_print("Could not process field {0}".format(str(column)))
-                arc_print(e.args[0])
+                san.arc_print("Could not process field {0}".format(str(column)))
+                san.arc_print(e.args[0])
                 pass
-        JoinField=arcpy.ValidateFieldName("DFIndexJoin",workspace)
-        scored_df[JoinField]=scored_df.index
+        JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
+        scored_df[JoinField] = scored_df.index
         finalColumnList.append(JoinField)
-        arc_print("Exporting new percentile dataframe to structured numpy array.", True)
-        finalStandardArray= scored_df.to_records()
-        arc_print("Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
-                 , True)
-        arcpy.da.ExtendTable(in_fc,OIDFieldName,finalStandardArray,JoinField,append_only=False)
-        arc_print("Script Completed Successfully.", True)
+        san.arc_print("Exporting new percentile dataframe to structured numpy array.", True)
+        finalStandardArray = scored_df.to_records()
+        san.arc_print(
+            "Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
+            , True)
+        arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
+        san.arc_print("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        arc_print(arcpy.GetMessages(2))
+        san.arc_print(arcpy.GetMessages(2))
     except Exception as e:
-        arc_print(e.args[0])
+        san.arc_print(e.args[0])
 
-    # End do_analysis function
+        # End do_analysis function
+
 
 # This test allows the script to be used from the operating
 # system command prompt (stand-alone), in a Python IDE,

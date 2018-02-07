@@ -2,7 +2,7 @@
 # Purpose: Will take a selected datetime field and will try to add text field with a formatted date time.
 # See http://strftime.org/ for details.
 # Author: David Wasserman
-# Last Modified: 7/4/2016
+# Last Modified: 2/7/2018
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
 # ArcGIS Version: 10.4 (Pro)
@@ -23,176 +23,13 @@
 # --------------------------------
 # Import Modules
 import os, arcpy, datetime
-import numpy as np
 import pandas as pd
-
+import SharedArcNumericalLib as san
 
 
 # Function Definitions
-def funcReport(function=None, reportBool=False):
-    """This decorator function is designed to be used as a wrapper with other functions to enable basic try and except
-     reporting (if function fails it will report the name of the function that failed and its arguments. If a report
-      boolean is true the function will report inputs and outputs of a function.-David Wasserman"""
 
-    def funcReport_Decorator(function):
-        def funcWrapper(*args, **kwargs):
-            try:
-                funcResult = function(*args, **kwargs)
-                if reportBool:
-                    print("Function:{0}".format(str(function.__name__)))
-                    print("     Input(s):{0}".format(str(args)))
-                    print("     Ouput(s):{0}".format(str(funcResult)))
-                return funcResult
-            except Exception as e:
-                print(
-                "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
-                print(e.args[0])
-
-        return funcWrapper
-
-    if not function:  # User passed in a bool argument
-        def waiting_for_function(function):
-            return funcReport_Decorator(function)
-
-        return waiting_for_function
-    else:
-        return funcReport_Decorator(function)
-
-
-def functionTime(function=None, reportTime=True):
-    """ If a report time boolean is true, it will print the datetime before and after function run. Includes
-    import with a rare namespace.-David Wasserman"""
-
-    def funcReport_Decorator(function):
-        def funcWrapper(*args, **kwargs):
-            if reportTime:
-                try:
-                    # from datetime import datetime as functionDateTime_nsx978 #Optional, but removed
-                    print("{0} Function Start:{1}".format(str(function.__name__), str(datetime.datetime.now())))
-                except:
-                    pass
-            funcResult = function(*args, **kwargs)
-            if reportTime:
-                try:
-                    print("{0} Function End:{1}".format(str(function.__name__), str(datetime.datetime.now())))
-                except:
-                    pass
-            return funcResult
-
-        return funcWrapper
-
-    if not function:  # User passed in a bool argument
-        def waiting_for_function(function):
-            return funcReport_Decorator(function)
-
-        return waiting_for_function
-    else:
-        return funcReport_Decorator(function)
-
-
-def arcToolReport(function=None, arcToolMessageBool=False, arcProgressorBool=False):
-    """This decorator function is designed to be used as a wrapper with other GIS functions to enable basic try and except
-     reporting (if function fails it will report the name of the function that failed and its arguments. If a report
-      boolean is true the function will report inputs and outputs of a function.-David Wasserman"""
-
-    def arcToolReport_Decorator(function):
-        def funcWrapper(*args, **kwargs):
-            try:
-                funcResult = function(*args, **kwargs)
-                if arcToolMessageBool:
-                    arcpy.AddMessage("Function:{0}".format(str(function.__name__)))
-                    arcpy.AddMessage("     Input(s):{0}".format(str(args)))
-                    arcpy.AddMessage("     Ouput(s):{0}".format(str(funcResult)))
-                if arcProgressorBool:
-                    arcpy.SetProgressorLabel("Function:{0}".format(str(function.__name__)))
-                    arcpy.SetProgressorLabel("     Input(s):{0}".format(str(args)))
-                    arcpy.SetProgressorLabel("     Ouput(s):{0}".format(str(funcResult)))
-                return funcResult
-            except Exception as e:
-                arcpy.AddMessage(
-                        "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__),
-                                                                                        str(args)))
-                print(
-                "{0} - function failed -|- Function arguments were:{1}.".format(str(function.__name__), str(args)))
-                print(e.args[0])
-
-        return funcWrapper
-
-    if not function:  # User passed in a bool argument
-        def waiting_for_function(function):
-            return arcToolReport_Decorator(function)
-
-        return waiting_for_function
-    else:
-        return arcToolReport_Decorator(function)
-
-@arcToolReport
-def arcPrint(string, progressor_Bool=False):
-    """ This function is used to simplify using arcpy reporting for tool creation,if progressor bool is true it will
-    create a tool label."""
-    casted_string=str(string)
-    if progressor_Bool:
-        arcpy.SetProgressorLabel(casted_string)
-        arcpy.AddMessage(casted_string)
-        print(casted_string)
-    else:
-        arcpy.AddMessage(casted_string)
-        print(casted_string)
-
-
-@arcToolReport
-def FieldExist(featureclass, fieldname):
-    """ArcFunction
-     Check if a field in a feature class field exists and return true it does, false if not.- David Wasserman"""
-    fieldList = arcpy.ListFields(featureclass, fieldname)
-    fieldCount = len(fieldList)
-    if (fieldCount >= 1)and fieldname.strip():  # If there is one or more of this field return true
-        return True
-    else:
-        return False
-
-
-@arcToolReport
-def AddNewField(in_table, field_name, field_type, field_precision="#", field_scale="#", field_length="#",
-                field_alias="#", field_is_nullable="#", field_is_required="#", field_domain="#"):
-    """ArcFunction
-    Add a new field if it currently does not exist. Add field alone is slower than checking first.- David Wasserman"""
-    if FieldExist(in_table, field_name):
-        print(field_name + " Exists")
-        arcpy.AddMessage(field_name + " Exists")
-    else:
-        print("Adding " + field_name)
-        arcpy.AddMessage("Adding " + field_name)
-        arcpy.AddField_management(in_table, field_name, field_type, field_precision, field_scale,
-                                  field_length,
-                                  field_alias,
-                                  field_is_nullable, field_is_required, field_domain)
-
-@arcToolReport
-def CreateUniqueFieldName(field_name,in_table):
-    """This function will be used to create a unique field name for an ArcGIS field by adding a number to the end.
-    If the file has field character limitations, the new field name will not be validated.- DJW."""
-    counter=1
-    new_field_name=field_name
-    while FieldExist(in_table, new_field_name) and counter<=1000:
-        print(field_name + " Exists, creating new name with counter {0}".format(counter))
-        new_field_name="{0}_{1}".format(str(field_name),str(counter))
-        counter+=1
-    return new_field_name
-
-@arcToolReport
-def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
-    """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
-    input fields."""
-    OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_fields = [OIDFieldName] + input_fields
-    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
-    object_id_index = np_array[OIDFieldName]
-    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
-    return fc_dataframe
-
-
-@functionTime(reportTime=False)
+@san.functionTime(reportTime=False)
 def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
     """ This function will take in an feature class, and use pandas/numpy to format a date string based on
     the input time format. """
@@ -200,40 +37,40 @@ def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
         # arc_print(pd.__version__) Does not have dt lib.
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
-        workspace= os.path.dirname(desc.catalogPath)
-        col_new_field = arcpy.ValidateFieldName(CreateUniqueFieldName(new_field_name,in_fc), workspace)
-        AddNewField(in_fc, col_new_field, "TEXT")
+        workspace = os.path.dirname(desc.catalogPath)
+        col_new_field = arcpy.ValidateFieldName(san.create_unique_field_name(new_field_name, in_fc), workspace)
+        san.add_new_field(in_fc, col_new_field, "TEXT")
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-        arcPrint("Creating Pandas Dataframe from input table.")
-        query= "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field),"is NOT","NULL")
-        fcDataFrame = arcgis_table_to_dataframe(in_fc, [input_field, col_new_field],query)
+        san.arc_print("Creating Pandas Dataframe from input table.")
+        query = "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field), "is NOT", "NULL")
+        fcDataFrame = san.arcgis_table_to_dataframe(in_fc, [input_field, col_new_field], query)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         fcDataFrame[JoinField] = fcDataFrame.index
         try:
-            arcPrint("Creating new text column based on field {0}.".format(str(input_field)), True)
+            san.arc_print("Creating new text column based on field {0}.".format(str(input_field)), True)
             fcDataFrame[col_new_field] = fcDataFrame[input_field].apply(lambda dt: dt.strftime(time_format))
             del fcDataFrame[input_field]
         except Exception as e:
             del fcDataFrame[input_field]
-            arcPrint(
+            san.arc_print(
                 "Could not process datetime field. "
                 "Check that datetime is a year appropriate to your python version and that "
                 "the time format string is appropriate.")
-            arcPrint(e.args[0])
+            san.arc_print(e.args[0])
             pass
 
-        arcPrint("Exporting new time field dataframe to structured numpy array.", True)
+        san.arc_print("Exporting new time field dataframe to structured numpy array.", True)
         finalStandardArray = fcDataFrame.to_records()
-        arcPrint("Joining new time string field to feature class.", True)
+        san.arc_print("Joining new time string field to feature class.", True)
         arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
-        arcPrint("Delete temporary intermediates.")
-        del fcDataFrame,finalStandardArray
-        arcPrint("Script Completed Successfully.", True)
+        san.arc_print("Delete temporary intermediates.")
+        del fcDataFrame, finalStandardArray
+        san.arc_print("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        arcPrint(arcpy.GetMessages(2))
+        san.arc_print(arcpy.GetMessages(2))
     except Exception as e:
-        arcPrint(e.args[0])
+        san.arc_print(e.args[0])
 
         # End do_analysis function
 
