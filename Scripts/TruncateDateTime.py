@@ -68,7 +68,6 @@ def assign_new_datetime(datetime_obj, year, month, day, hour, minute, second, mi
         return datetime.date.min
 
 
-@san.functionTime(reportTime=False)
 def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
                        set_minute=None, set_second=None, set_microsecond=None):
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the

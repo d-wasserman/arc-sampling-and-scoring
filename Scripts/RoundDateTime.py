@@ -21,9 +21,8 @@
 # limitations under the License.
 # --------------------------------
 # Import Modules
-import SharedArcNumericalLib as anl
+import SharedArcNumericalLib as san
 import os, arcpy, datetime
-import numpy as np
 import pandas as pd
 
 
@@ -31,7 +30,7 @@ import pandas as pd
 
 
 
-@anl.functionTime(reportTime=False)
+@san.arc_tool_report
 def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
                     set_minute=None, set_second=None):
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the
@@ -41,41 +40,41 @@ def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
         workspace = os.path.dirname(desc.catalogPath)
-        col_new_field = arcpy.ValidateFieldName(anl.CreateUniqueFieldName(new_field_name, in_fc), workspace)
-        AddNewField(in_fc, col_new_field, "DATE")
+        col_new_field = arcpy.ValidateFieldName(san.create_unique_field_name(new_field_name, in_fc), workspace)
+        san.add_new_field(in_fc, col_new_field, "DATE")
         OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-        arcPrint("Creating Pandas Dataframe from input table.")
+        san.arc_print("Creating Pandas Dataframe from input table.")
         query = "{0} {1} {2}".format(arcpy.AddFieldDelimiters(in_fc, input_field), "is NOT", "NULL")
-        fcDataFrame = arcgis_table_to_dataframe(in_fc, [input_field, col_new_field], query)
+        fcDataFrame = san.arcgis_table_to_dataframe(in_fc, [input_field, col_new_field], query)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         fcDataFrame[JoinField] = fcDataFrame.index
         try:
-            arcPrint("Creating new date-time column based on field {0}.".format(str(input_field)), True)
+            san.arc_print("Creating new date-time column based on field {0}.".format(str(input_field)), True)
             fcDataFrame[col_new_field] = fcDataFrame[input_field].apply(
-                lambda dt: round_new_datetime(dt, set_year, set_month, set_day, set_hour, set_minute,
+                lambda dt: san.round_new_datetime(dt, set_year, set_month, set_day, set_hour, set_minute,
                                               set_second)).astype(datetime.datetime)
             del fcDataFrame[input_field]
         except Exception as e:
             del fcDataFrame[input_field]
-            arcPrint(
+            san.arc_print(
                 "Could not process datetime field. "
                 "Check that datetime is a year appropriate to your python version and that "
                 "the time format string is appropriate.")
-            arcPrint(e.args[0])
+            san.arc_print(e.args[0])
             pass
 
-        arcPrint("Exporting new time field dataframe to structured numpy array.", True)
+        san.arc_print("Exporting new time field dataframe to structured numpy array.", True)
         finalStandardArray = fcDataFrame.to_records()
-        arcPrint("Joining new date-time field to feature class.", True)
+        san.arc_print("Joining new date-time field to feature class.", True)
         arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
-        arcPrint("Delete temporary intermediates.")
+        san.arc_print("Delete temporary intermediates.")
         del fcDataFrame, finalStandardArray
-        arcPrint("Script Completed Successfully.", True)
+        san.arc_print("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
-        arcPrint(arcpy.GetMessages(2))
+        san.arc_print(arcpy.GetMessages(2))
     except Exception as e:
-        arcPrint(e.args[0])
+        san.arc_print(e.args[0])
 
         # End do_analysis function
 

@@ -30,7 +30,7 @@ from scipy import stats
 
 # Function Definitions
 
-@san.functionTime(reportTime=False)
+
 def add_Percentile_Fields(in_fc, input_fields, ignore_nulls=True):
     """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy."""

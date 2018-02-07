@@ -28,7 +28,6 @@ import SharedArcNumericalLib as san
 
 # Function Definitions
 
-@san.functionTime(reportTime=False)
 def add_Standarized_Fields(in_fc, input_Fields, ignore_nulls=True):
     """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
     join them back to the feature class using arcpy."""

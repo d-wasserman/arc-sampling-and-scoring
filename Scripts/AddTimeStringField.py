@@ -29,7 +29,6 @@ import SharedArcNumericalLib as san
 
 # Function Definitions
 
-@san.functionTime(reportTime=False)
 def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
     """ This function will take in an feature class, and use pandas/numpy to format a date string based on
     the input time format. """

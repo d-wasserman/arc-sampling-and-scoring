@@ -31,7 +31,7 @@ import SharedArcNumericalLib as san
 # Function Definitions
 
 # Main Function Definition
-@san.arc_tool_report
+
 def temporal_mean_center(inFeatureClass, outFeatureClass, start_time, end_time, time_interval, bin_start,
                          weight_field, case_field, dimension_field):
     """ This tool will split a feature class into multiple kernel densities based on a datetime field and a

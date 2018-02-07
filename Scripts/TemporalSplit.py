@@ -30,7 +30,7 @@ import SharedArcNumericalLib as san
 # Function Definitions
 
 # Main Function Definition
-@san.arc_tool_report
+
 def temporal_split(inFeatureClass, outWorkSpace, start_time, end_time, time_interval, bin_start=None, compactBool=True):
     """ This tool will split a feature class into multiple feature classes based on a datetime field based on
     a set time interval."""
