@@ -38,17 +38,19 @@ def add_Standarized_Fields(in_fc, input_Fields, ignore_nulls=True):
         workspace = os.path.dirname(desc.catalogPath)
         input_Fields_List = input_Fields
         finalColumnList = []
+        scored_df = None
         for column in input_Fields_List:
             try:
                 field_series = san.arcgis_table_to_dataframe(in_fc, [column], skip_nulls=ignore_nulls, null_values=0)
                 san.arc_print("Creating standarized column for field {0}.".format(str(column)), True)
                 col_Standarized = arcpy.ValidateFieldName("Zscore_" + column, workspace)
-                scored_df[col_Standarized] = (scored_df[column] - scored_df[column].mean()) / scored_df[column].std(
-                    ddof=0)
+                field_series[col_Standarized] = (field_series[column] - field_series[column].mean()) / field_series[
+                    column].std(ddof=0)
                 finalColumnList.append(col_Standarized)
                 if col_Standarized != column:
                     del field_series[column]
                 if scored_df is None:
+                    san.arc_print("Test")
                     scored_df = field_series
                 else:
                     scored_df = pd.merge(scored_df, field_series, how="outer", left_index=True, right_index=True)
