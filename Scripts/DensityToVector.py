@@ -45,9 +45,18 @@ except:
 
 
 def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=True, field_edit="", cell_size=500,
-                      search_radius=800, area_unit="SQUARE_MILES",sample_points=1):
+                      search_radius=800, area_unit="SQUARE_MILES"):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
-     percentile bool is true, percentile scores are added along side each density. """
+     percentile bool is true, percentile scores are added along side each density.
+     :param
+     in_fc: input feature class
+     weighted_fields: fields to use for a weighted KDE
+     input_network: point,polyline,polygon file to associate density values to
+     percentile_bool: if true, adds percentiles to scores
+     field_edit: prepended field name
+     cell_size: cell size of KDE raster
+     search_radius: search radius/bandwith of KDE
+     area_unit: unit of output raster"""
     try:
         arcpy.env.overwriteOutput = True
         # Start Analysis
