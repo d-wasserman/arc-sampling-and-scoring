@@ -45,7 +45,7 @@ except:
 
 
 def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=True, field_edit="", cell_size=500,
-                      search_radius=800, area_unit="SQUARE_MILES"):
+                      search_radius=800, area_unit="SQUARE_MILES",sample_points=1):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
      percentile bool is true, percentile scores are added along side each density. """
     try:
@@ -56,13 +56,13 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         temp_out_sample = "in_memory/sample_points_out"
         temp_sample_points = "in_memory/sample_points"
         temp_input_layer = "Temp_Input_Layer"
-        san.san.arc_print("Generating sample points from network in memory...")
+        san.arc_print("Generating sample points from feature class in memory...")
         arcpy.FeatureToPoint_management(input_network, temp_sample_points, True)
         final_df = None
         join_field = "JNField"
         oid_field = str(desc.OIDFieldName)
         for field in weighted_fields:
-            san.san.arc_print("Computing density for field {0}...".format(field))
+            san.arc_print("Computing density for field {0}...".format(field))
             arcpy.MakeFeatureLayer_management(in_fc, temp_input_layer,
                                               san.construct_sql_equality_query(field, None, work_space,
                                                                                noneEqualityOperator="is not"))
