@@ -245,6 +245,17 @@ def generate_statistical_fieldmap(target_features, join_features, prepended_name
             field_mappings.addFieldMap(new_field_map)
     return field_mappings
 
+def generate_sample_points(in_fc,out_fc,sample_percentage=10):
+    """This will take in a feature class and return a feature class of points. Polygons and points have feature to point
+    used, and line files have sample points created along the line in lengths an equal distance apart as close to the
+    distance set in this function in the units of the current projection."""
+    describe_obj= arcpy.Describe(in_fc)
+    shape_type= str(describe_obj.shapeType)
+    if shape_type=="Polyline":
+        arcpy.GeneratePointsAlongLines_management(in_fc,out_fc,"PERCENTAGE",None,int(sample_percentage),'END_POINTS')
+    else:
+        arcpy.FeatureToPoint_management(in_fc, out_fc, True)
+    return out_fc
 
 ###########################
 # ArcTime
