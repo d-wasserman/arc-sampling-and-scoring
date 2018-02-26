@@ -170,6 +170,16 @@ def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, n
     fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
     return fc_dataframe
 
+@arc_tool_report
+def arcgis_table_to_df(in_fc,input_fields,query=""):
+    """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
+        input fields. Uses a da search cursor."""
+    OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
+    final_fields = [OIDFieldName] + input_fields
+    record_list = [row for row in arcpy.da.SearchCursor(in_fc,final_fields,query)]
+    oid_collection = [row[0] for row in record_list]
+    fc_dataframe = pd.DataFrame(record_list, index=oid_collection, columns=final_fields)
+    return fc_dataframe
 
 @arc_tool_report
 def arc_unique_values(table, field, filter_falsy=False):
