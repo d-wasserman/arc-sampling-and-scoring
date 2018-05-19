@@ -208,7 +208,14 @@ def arc_unique_value_lists(in_feature_class, field_list, filter_falsy=False):
 def construct_sql_equality_query(fieldName, value, dataSource, equalityOperator="=", noneEqualityOperator="is"):
     """Creates a workspace sensitive equality query to be used in arcpy/SQL statements. If the value is a string,
     quotes will be used for the query, otherwise they will be removed. Python 2-3 try except catch.(BaseString not in 3)
-    David Wasserman"""
+    David Wasserman
+    :params
+    fieldName(str): field name in sql query to return
+    value(str): value for target query
+    dataSource(str): path of the workspace of the feature receiving the query - impacts delimiter options.
+    equalityOperator(str): the operator used to build a query relationship between fieldName and value.
+    noneEqualityOperator: operator used if the target value is None/Null
+    :returns sql query string with appropriate delimiters"""
     try:  # Python 2
         if isinstance(value, (basestring, str)):
             return "{0} {1} '{2}'".format(arcpy.AddFieldDelimiters(dataSource, fieldName), equalityOperator, str(value))
@@ -238,7 +245,13 @@ def get_duplicates(items):
 def generate_statistical_fieldmap(target_features, join_features, prepended_name="", merge_rule_dict={}):
     """Generates field map object based on passed field objects based on passed tables (list),
     input_field_objects (list), and passed statistics fields to choose for numeric and categorical variables. Output
-    fields take the form of *merge rule*+*prepended_name*+*fieldname*"""
+    fields take the form of *merge rule*+*prepended_name*+*fieldname*
+    :params
+    target_features(str): target feature class that will maintain its field attributes
+    join_features(str): join feature class whose numeric fields will be joined based on the merge rule dictionary
+    prepended_name(str): modifies output join fields with param text between the statistics and the original field name
+    merge_rule_dict (dict): a  dictionary of the form {statistic_type:[Fields,To,Summarize]}
+    :returns arcpy field mapping object"""
     field_mappings = arcpy.FieldMappings()
     # We want every field in 'target_features' and all fields in join_features that are present
     # in the field statistics mappping.
