@@ -1,7 +1,7 @@
 # Name: PercentileScoreFields.py
 # Purpose: Will add selected fields as percentile scores by extending a numpy array to the feature class.
 # Author: David Wasserman
-# Last Modified: 4/15/2017
+# Last Modified: 4/15/2021
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
 # ArcGIS Version: 10.4 (Pro)
@@ -31,9 +31,15 @@ from scipy import stats
 # Function Definitions
 
 
-def add_Percentile_Fields(in_fc, input_fields, ignore_nulls=True):
+def add_percentile_fields(in_fc, input_fields, ignore_nulls=True):
     """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
-    join them back to the feature class using arcpy."""
+    join them back to the feature class using arcpy.
+    Parameters
+    -----------------
+    in_fc- input feature class to add percentile fields
+    input_fields - table fields to percentile score
+    ignore_nulls - ignore null values in percentile calculations
+    """
     try:
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
@@ -87,4 +93,4 @@ if __name__ == '__main__':
     FeatureClass = arcpy.GetParameterAsText(0)
     InputFields = arcpy.GetParameterAsText(1).split(";")
     IgnoreNulls = bool(arcpy.GetParameter(2))
-    add_Percentile_Fields(FeatureClass, InputFields, IgnoreNulls)
+    add_percentile_fields(FeatureClass, InputFields, IgnoreNulls)

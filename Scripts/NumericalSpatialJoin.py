@@ -3,7 +3,7 @@
 # Purpose: This script is intended to provide an alternative method and GUI for spatial joins so that target feature
 # classes are set to first and additional join fields are chosen by statistic. A field is provided to change the name.
 # Current Owner: David Wasserman
-# Last Modified: 2/7/2018
+# Last Modified: 2/7/2021
 # Copyright:   David Wasserman
 # ArcGIS Version:   ArcGIS Pro/10.4
 # Python Version:   3.5/2.7
@@ -34,7 +34,44 @@ def statistical_spatial_join(target_feature, join_features, out_feature_class, p
                              join_operation="JOIN_ONE_TO_ONE", join_type=True, match_option="INTERSECT",
                              search_radius=None, merge_rule_dict={}):
     """This function will join features to a target feature class using merge fields that are chosen based on the
-     chosen summary statistics fields from the join feature class while keeping all the fields in the target."""
+     chosen summary statistics fields from the join feature class while keeping all the fields in the target.
+     Parameters
+    -----------------
+    target_feature - Attributes of the target features and the attributes from the joined features are transferred to
+    the output feature class. However, a subset of attributes can be defined in the field map parameter.
+    join_features - The attributes from the join features are joined to the attributes of the target features.
+    See the explanation of the join_operation parameter for details on how the aggregation of joined attributes
+    are affected by the type of join operation.
+    out_feature_class - A new feature class containing the attributes of the target and join features. By default,
+    all attributes of target features and the attributes of the joined features are written to the output. However,
+    the set of attributes to be transferred can be controlled by the field map parameter.
+    join_operation - Specifies how joins between the target features and join features will be handled in the output
+    feature class if multiple join features are found that have the same spatial relationship with a single target
+    feature.
+        JOIN_ONE_TO_ONE —If multiple join features are found that have the same spatial relationship with a single
+         target feature, the attributes from the multiple join features will be aggregated using a field map merge rule.
+         For example, if a point target feature is found within two separate polygon join features, the attributes from
+          the two polygons will be aggregated before being transferred to the output point feature class. If one polygon
+          has an attribute value of 3 and the other has a value of 7, and a Sum merge rule is specified, the aggregated
+          value in the output feature class will be 10. This is the default.
+        JOIN_ONE_TO_MANY —If multiple join features are found that have the same spatial relationship with a single
+         target feature, the output feature class will contain multiple copies (records) of the target feature. For
+         example, if a single point target feature is found within two separate polygon join features, the output
+         feature class will contain two copies of the target feature: one record with the attributes of one polygon
+         and another record with the attributes of the other polygon.
+     join_type - Specifies whether all target features will be maintained in the output feature class (known as outer
+      join) or only those that have the specified spatial relationship with the join features (inner join).
+        KEEP_ALL —All target features will be maintained in the output (outer join). This is the default.
+        KEEP_COMMON — Only those target features that have the specified spatial relationship with the join features
+         will be maintained in the output feature class (inner join). For example, if a point feature class is specified
+         for the target features, and a polygon feature class is specified for the join features, with match_option =
+          "WITHIN", the output feature class will only contain those target features that are within a polygon
+          join feature. Any target features not within a join feature will be excluded from the output.
+      match_option - Specifies the criteria used to match rows.
+        See https://pro.arcgis.com/en/pro-app/latest/tool-reference/analysis/spatial-join.htm
+     search_radius - Join features within this distance of a target feature will be considered for the spatial join.
+     merge_rule_dict - a dictionary of the form {statistic_type:[Fields,To,Summarize]}
+     """
     try:
         arcpy.env.overwriteOutput = True
         # Start Analysis
