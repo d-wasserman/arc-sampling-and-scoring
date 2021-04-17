@@ -34,7 +34,19 @@ import pandas as pd
 def round_date_time(in_fc, input_field, new_field_name, set_year=None, set_month=None, set_day=None, set_hour=None,
                     set_minute=None, set_second=None):
     """ This function will take in an feature class, and use pandas/numpy to truncate a date time so that the
-     passed date-time attributes are set to a target."""
+     passed date-time attributes are set to a target.
+         Parameters
+    -----------------
+     in_fc - input feature class with datetime field
+     input_field - input time field
+     new_field_name - new field created
+     set_year - year to set
+     set_month - month to set
+     set_day - day to set
+     set_hour - hour to set
+     set_minute - minute to set
+     set_second - second ot set
+     """
     try:
         # arc_print(pd.__version__) Does not have dt lib.
         arcpy.env.overwriteOutput = True

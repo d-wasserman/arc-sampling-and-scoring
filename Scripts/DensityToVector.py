@@ -5,7 +5,7 @@
 # a network feature class. If provided a list of numbers, the tool will compute percentiles of the input densities
 # and will add percentile scores to the input densities for non-zero/non-null values.
 # Current Owner: David Wasserman
-# Last Modified: 2/7/2018
+# Last Modified: 4/16/2021
 # Copyright:   David Wasserman
 # ArcGIS Version:   ArcGIS Pro/10.4
 # Python Version:   3.5/2.7
@@ -48,7 +48,8 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
                       search_radius=800, area_unit="SQUARE_MILES",sample_percentage=25,group_by_statistic="MEAN"):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
      percentile bool is true, percentile scores are added along side each density.
-     :param
+     Parameters
+     -----------------
      in_fc: input feature class
      weighted_fields: fields to use for a weighted KDE
      input_network: point,polyline,polygon file to associate density values to
