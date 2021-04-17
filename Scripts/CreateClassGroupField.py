@@ -1,7 +1,7 @@
 # Name: CreateClassGroupField.py
 # Purpose: Will group selected fields into a unique group field for every unique combination of the selected fields.
 # Author: David Wasserman
-# Last Modified: 2/7/2018
+# Last Modified: 2/7/2021
 # Copyright: David Wasserman
 # Python Version:   2.7-3.1
 # ArcGIS Version: 10.3.1 (Pro)
@@ -62,14 +62,19 @@ def constructUniqueStringID(values, delimiter="."):
     return final_chained_id
 
 
-def create_Class_Group_Field(in_fc, input_Fields, basename="GROUP_"):
+def create_class_group_field(in_fc, input_fields, basename="GROUP_"):
     """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
-    join them back to the feature class using arcpy."""
+    join them back to the feature class using arcpy.
+        Parameters
+    -----------------
+    in_fc- input feature class to add percentile fields
+    input_fields - input fields to build a unique id from
+    basename- base name for group fields."""
     try:
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
         workspace = os.path.dirname(desc.catalogPath)
-        input_Fields_List = input_Fields.split(';')
+        input_Fields_List = input_fields.split(';')
         san.arc_print("Adding Class Fields.", True)
         valid_num_field = arcpy.ValidateFieldName("{0}_Num".format(basename), workspace)
         valid_text_field = arcpy.ValidateFieldName("{0}_Text".format(basename), workspace)
@@ -115,4 +120,4 @@ if __name__ == '__main__':
     FeatureClass = arcpy.GetParameterAsText(0)  # r"C:"
     InputFields = arcpy.GetParameterAsText(1)  # "CBSA_POP;D5cri"
     BaseName = arcpy.GetParameterAsText(2)  # "GROUP"
-    create_Class_Group_Field(FeatureClass, InputFields, BaseName)
+    create_class_group_field(FeatureClass, InputFields, BaseName)
