@@ -31,29 +31,37 @@ import SharedArcNumericalLib as san
 
 # Main Function Definition
 
-def temporal_split(inFeatureClass, outWorkSpace, start_time, end_time, time_interval, bin_start=None, compactBool=True):
+def temporal_split(in_fc, out_ws, start_time, end_time, time_interval, compactBool=True):
     """ This tool will split a feature class into multiple feature classes based on a datetime field based on
-    a set time interval."""
+    a set time interval.
+     Parameters
+    -----------------
+     in_fc - input feature class with datetime field
+     out_ws- out workspace
+     start_time - start date time
+     end_time - end date time
+     time_interval - temporal spacing
+     compactBool - compact db after run."""
     try:
-        if arcpy.Exists(outWorkSpace):
-            arcpy.env.workspace = outWorkSpace
+        if arcpy.Exists(out_ws):
+            arcpy.env.workspace = out_ws
             arcpy.env.overwriteOutput = True
-            san.arc_print("The current work space is: {0}.".format(outWorkSpace), True)
-            workSpaceTail = os.path.split(outWorkSpace)[1]
+            san.arc_print("The current work space is: {0}.".format(out_ws), True)
+            workSpaceTail = os.path.split(out_ws)[1]
             san.arc_print("Constructing Time Delta from input time period string.", True)
             time_magnitude, time_unit = san.alphanumeric_split(time_interval)
             time_delta = san.parse_time_units_to_dt(time_magnitude, time_unit)
-            inFeatureClassTail = os.path.split(inFeatureClass)[1]
+            inFeatureClassTail = os.path.split(in_fc)[1]
             san.arc_print(
                 "Using datetime fields to generate new feature classes in {0}.".format(
                     str(workSpaceTail)))
             san.arc_print("Getting start and final times in start time field {0}.".format(start_time))
-            start_time_min, start_time_max = san.get_min_max_from_field(inFeatureClass, start_time)
+            start_time_min, start_time_max = san.get_min_max_from_field(in_fc, start_time)
 
-            if san.field_exist(inFeatureClass, end_time) and end_time:
+            if san.field_exist(in_fc, end_time) and end_time:
                 san.arc_print("Using start and end time to grab feature classes whose bins occur within an events "
                               "start or end time.")
-                end_time_min, end_time_max = san.get_min_max_from_field(inFeatureClass, end_time)
+                end_time_min, end_time_max = san.get_min_max_from_field(in_fc, end_time)
                 start_time_field = start_time
                 end_time_field = end_time
                 start_time_range = start_time_min
@@ -70,7 +78,7 @@ def temporal_split(inFeatureClass, outWorkSpace, start_time, end_time, time_inte
                               .format(str(bin_start_time)))
             time_bins = san.construct_time_bin_ranges(start_time_range, end_time_range, time_delta)
             san.arc_print("Constructing queries based on datetime ranges.")
-            temporal_queries = san.construct_sql_queries_from_time_bin(time_bins, inFeatureClass, start_time_field,
+            temporal_queries = san.construct_sql_queries_from_time_bin(time_bins, in_fc, start_time_field,
                                                                        end_time_field)
             time_counter = 0
             san.arc_print("Splitting feature classes based on {0} queries.".format(len(temporal_queries)), True)
@@ -79,9 +87,9 @@ def temporal_split(inFeatureClass, outWorkSpace, start_time, end_time, time_inte
                     time_counter += 1
                     san.arc_print("Determining name and constructing query for new feature class.", True)
                     newFCName = "Bin_{0}_{1}".format(time_counter,
-                                                     arcpy.ValidateTableName(inFeatureClassTail, outWorkSpace))
+                                                     arcpy.ValidateTableName(inFeatureClassTail, out_ws))
                     expression = str(query)
-                    arcpy.Select_analysis(inFeatureClass, newFCName, expression)
+                    arcpy.Select_analysis(in_fc, newFCName, expression)
                     san.arc_print(
                         "Selected out unique ID: {0} with query [{1}] and created a new feature class in {2}".format(
                             newFCName, expression, workSpaceTail), True)
@@ -93,7 +101,7 @@ def temporal_split(inFeatureClass, outWorkSpace, start_time, end_time, time_inte
             if compactBool:
                 try:
                     san.arc_print("Compacting workspace.", True)
-                    arcpy.Compact_management(outWorkSpace)
+                    arcpy.Compact_management(out_ws)
                 except:
                     san.arc_print("Not a Compact capable workspace.")
                     pass
