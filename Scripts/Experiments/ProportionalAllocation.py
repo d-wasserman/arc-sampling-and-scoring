@@ -1,7 +1,8 @@
 # --------------------------------
 # Name: ProportionalAllocation.py
-# Purpose: This script is intended to provide a way to use sampling geography that will either calculate proportional
-# averages and sums based on the percentage of an intersection covered. 
+# Purpose: This script is intended to provide a way to use sampling geography that will calculate proportional
+# averages or sums based on the percentage of an intersection covered by the sampling geography. The output is
+# the sampling geography with fields sampled from the base features.
 # Current Owner: David Wasserman
 # Last Modified: 4/17/2021
 # Copyright:   David Wasserman
@@ -25,21 +26,36 @@
 
 # Import Modules
 import arcpy
+import pandas as pd
+from arcgis.features import GeoAccessor, GeoSeriesAccessor
+
 import SharedArcNumericalLib as san
 
 
 # Function Definitions
 
-def proportional_allocation(sampling_features, base_features, out_feature_class, prepended_field_name="",
-                             sum_fields=[],mean_fields=[]):
-    """This function will join features to a target feature class using merge fields that are chosen based on the
-     chosen summary statistics fields from the join feature class while keeping all the fields in the target."""
+def proportional_allocation(sampling_features, base_features, out_feature_class,
+                            sum_fields=[], mean_fields=[]):
+    """This script is intended to provide a way to use sampling geography that will calculate proportional
+     averages or sums based on the percentage of an intersection covered by the sampling geography. The output is
+     the sampling geography with fields sampled from the base features."""
     try:
         arcpy.env.overwriteOutput = True
         # Start Analysis
+        temp_intersect = os.path.join("in_memory", "temp_intersect")
         san.arc_print("Calculating original areas...")
-        arcpy.CalculateField(base_features,"ORIG_AREA","!shape.area@square!")
-        san.arc_print("Conducting spatial join...")
+        san.add_new_field(base_features, "Base_Area_SQMI", "DOUBLE")
+        arcpy.CalculateField(base_features, "Base_Area_SQMI", "!shape.area@SQUAREMILES!")
+        san.arc_print("Conducting an intersection...", True)
+        arcpy.Intersect_analysis([[sampling_features, 1], [base_features, 1]], temp_intersect)
+        san.add_new_field(temp_intersect, "Inter_Area_SQMI", "DOUBLE")
+        arcpy.CalculateField(temp_intersect, "Inter_Area_SQMI", "!shape.area@SQUAREMILES!")
+        san.arc_print("Calculating proportional sums and/or averages...", True)
+        all_fields = ["Base_Area_SQMI", "Inter_Area_SQMI"] + sum_fields, + mean_fields
+        inter_df = san.arcgis_table_to_df(temp_intersect, all_fields)
+        samp_df = pd.DataFrame.spatial.from_featureclass(sampling_features)
+        san.arc_print("Associating results to sampled SEDF...")
+        san.arc_print("Exporting results...", True)
         san.arc_print("Script Completed Successfully.", True)
     except arcpy.ExecuteError:
         san.arc_print(arcpy.GetMessages(2))
@@ -57,17 +73,8 @@ if __name__ == '__main__':
     # Define input parameters
     target_feature_class = arcpy.GetParameterAsText(0)
     join_feature_class = arcpy.GetParameterAsText(1)
-    output_feature_Class = arcpy.GetParameterAsText(2)
-    prepended_field_name = arcpy.GetParameterAsText(3)
-    join_operation = arcpy.GetParameterAsText(4)
-    join_type = "KEEP_ALL" if bool(arcpy.GetParameter(5)) else "KEEP_COMMON"
-    match_option = str(arcpy.GetParameterAsText(6)).strip()
-    search_radius = arcpy.GetParameter(7)
-    # Simplify processing by associating input lists to target merge rules
-    merge_rule_dict = {}
-    merge_rule_identifiers = ["SUM", "MEAN", "MEDIAN", "MODE", "STD", "MIN", "MAX", "RANGE", "COUNT", "FIRST"]
-    for merge_rule, index in zip(merge_rule_identifiers, range(8, 18)):
-        merge_rule_dict[merge_rule] = [field for field in arcpy.GetParameterAsText(index).split(";") if
-                                       san.field_exist(join_feature_class, field)]
-    statistical_spatial_join(target_feature_class, join_feature_class, output_feature_Class, prepended_field_name,
-                             join_operation, join_type, match_option, search_radius, merge_rule_dict)
+    output_feature_class = arcpy.GetParameterAsText(2)
+    sum_fields = arcpy.GetParameterAsText(3).split(";")
+    mean_fields = arcpy.GetParameterAsText(4).split(";")
+
+    proportional_allocation(target_feature_class, join_feature_class, output_feature_class, sum_fields, mean_fields)
