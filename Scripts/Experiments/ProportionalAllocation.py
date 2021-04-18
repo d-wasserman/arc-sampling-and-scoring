@@ -26,6 +26,7 @@
 
 # Import Modules
 import arcpy
+import os
 import pandas as pd
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 
@@ -56,16 +57,21 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
         temp_intersect = os.path.join("in_memory", "temp_intersect")
         san.arc_print("Calculating original areas...")
         san.add_new_field(base_features, "Base_Area_SQMI", "DOUBLE")
-        arcpy.CalculateField(base_features, "Base_Area_SQMI", "!shape.area@SQUAREMILES!")
+        arcpy.CalculateField_management(base_features, "Base_Area_SQMI", "!shape.area@SQUAREMILES!")
         san.arc_print("Conducting an intersection...", True)
         arcpy.Intersect_analysis([[sampling_features, 1], [base_features, 1]], temp_intersect)
         san.add_new_field(temp_intersect, "Inter_Area_SQMI", "DOUBLE")
-        arcpy.CalculateField(temp_intersect, "Inter_Area_SQMI", "!shape.area@SQUAREMILES!")
+        arcpy.CalculateField_management(temp_intersect, "Inter_Area_SQMI", "!shape.area@SQUAREMILES!")
         san.arc_print("Calculating proportional sums and/or averages...", True)
-        all_fields = ["Base_Area_SQMI", "Inter_Area_SQMI"] + sum_fields, + mean_fields
+        all_fields = ["Base_Area_SQMI", "Inter_Area_SQMI"] + sum_fields + mean_fields
         inter_df = san.arcgis_table_to_df(temp_intersect, all_fields)
+        inter_df["Proportion"] = inter_df["Inter_Area_SQMI"].fillna(0)/inter_df["Base_Area_SQMI"].fillna(1)
+        for sum_field in sum_fields:
+            new_field = "ProSUM_" + str(sum_field)
+            inter_df
         samp_df = pd.DataFrame.spatial.from_featureclass(sampling_features)
         san.arc_print("Associating results to sampled SEDF...")
+        san.arc_print(inter_df.head())
         san.arc_print("Exporting results...", True)
         san.arc_print("Script Completed Successfully.", True)
     except arcpy.ExecuteError:
