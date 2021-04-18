@@ -3,43 +3,17 @@
   <component name="ChangeListManager">
     <list default="true" id="4f078f43-5c10-45f7-b29c-f2f0947f4d1d" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Experiments/ProportionalAllocation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Experiments/ProportionalAllocation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProportionalAllocation.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProportionalAllocation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000004.freelist" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000004.freelist" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000004.gdbtable" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000004.gdbtable" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000004.gdbtablx" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000004.gdbtablx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000004.spx" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000004.spx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000038.freelist" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000038.freelist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000038.gdbtable" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000038.gdbtable" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ToolData.gdb/a00000038.gdbtablx" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/a00000038.gdbtablx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ToolData.gdb/timestamps" beforeDir="false" afterPath="$PROJECT_DIR$/../ToolData.gdb/timestamps" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../arc-numerical-test.aprx" beforeDir="false" afterPath="$PROJECT_DIR$/../arc-numerical-test.aprx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>getFie</find>
-      <find>unique</find>
-      <find>arcPrint</find>
-      <find>AddNewField</find>
-      <find>AddNewField(</find>
-      <find>arc_print</find>
-      <find>time</find>
-      <find>arcPrint(</find>
-      <find>scored_df</find>
-      <find>san.san</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>@arc_tool_report</replace>
-      <replace>arc_print</replace>
-      <replace>san.add_new_field</replace>
-      <replace>san.add_new_field(</replace>
-      <replace>san.arc_print</replace>
-      <replace>san.arc_print(</replace>
-    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
