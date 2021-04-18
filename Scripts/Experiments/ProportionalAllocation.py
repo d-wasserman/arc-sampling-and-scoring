@@ -38,7 +38,18 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
                             sum_fields=[], mean_fields=[]):
     """This script is intended to provide a way to use sampling geography that will calculate proportional
      averages or sums based on the percentage of an intersection covered by the sampling geography. The output is
-     the sampling geography with fields sampled from the base features."""
+     the sampling geography with fields sampled from the base features.
+     Parameters
+     --------------------
+     sampling_features - The sampling features are the features you want to associate proportional averages or sums
+     from the attributes in the base features. The output will look like this input polygon layer with new fields.
+     base_features- The base features have the attributes being sampled by the polygon sampling features.
+     out_feature_class - The output feature class is a copy of the sampling features with new sum & average fields
+     sum_fields - Fields to proportionally sum (based on the overlapping areas between the sampling and base features)
+     from the base to the sampling features.
+     mean_fields - Fields to proportionally average (based on the overlapping areas between the sampling and base features)
+     from the base to the sampling features.
+     """
     try:
         arcpy.env.overwriteOutput = True
         # Start Analysis
