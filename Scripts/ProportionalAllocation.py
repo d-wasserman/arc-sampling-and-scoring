@@ -85,6 +85,10 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
                                 suffixes=("DELETE_X", "DELETE_Y"))
         kept_cols = [i for i in samp_df.columns if "DELETE" not in i]
         samp_df = samp_df[kept_cols].copy()
+        sum_rename = {i:"SUM_"+str(i) for i in sum_fields}
+        mean_rename = {i: "MEAN_" + str(i) for i in mean_fields}
+        sum_rename.update(mean_rename)
+        samp_df = samp_df.rename(columns=sum_rename)
         san.arc_print("Exporting results...", True)
         samp_df.spatial.to_featureclass(out_feature_class)
         san.arc_print("Script Completed Successfully.", True)
