@@ -1,8 +1,9 @@
 # Distribution Summary
 A set of ArcGIS tools that use Numpy and Pandas to help with different data analysis tasks such as standardizing data and creating group IDs. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below. 
+
 # ArcNumerical TBX
 # StandarizeFields Summary
-This 10.4 ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
+This ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
 The goal of this script is to add new fields with standardized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
 ![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/master/Help/Test.jpg?raw=true)
@@ -85,7 +86,7 @@ The goal of this script is to add new fields with standardized Z Scores for ever
  </div>
 
 # PercentileFields Summary
-This 10.4 ArcGIS scripting tool is designed to take selected fields and create an added field with a percentile score for each one of the selected fields. 
+This ArcGIS scripting tool is designed to take selected fields and create an added field with a percentile score for each one of the selected fields. 
 # Usage
 The goal of this script is to add new fields with percentile scores for every field selected. The percentile scores
 are based on the values of each column, so they will change depending on the extent of the current data set. 
