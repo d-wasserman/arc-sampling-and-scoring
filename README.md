@@ -1,10 +1,10 @@
 # Distribution Summary
-A set of ArcGIS tools that use Numpy and Pandas to help with different data analysis tasks such as standarizing data and creating group IDs. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below. 
+A set of ArcGIS tools that use Numpy and Pandas to help with different data analysis tasks such as standardizing data and creating group IDs. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below. 
 # ArcNumerical TBX
 # StandarizeFields Summary
 This 10.4 ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
-The goal of this script is to add new fields with standarized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
+The goal of this script is to add new fields with standardized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
 ![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/master/Help/Test.jpg?raw=true)
 
 # Parameters
@@ -63,20 +63,20 @@ The goal of this script is to add new fields with standarized Z Scores for every
  <td class="info">Input_Feature_Class</td>
  <td class="info" align="left">
  <span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>This is the selected input feature class that will have new group fields joined to it. If the fields already exist, they will be updated by the tool. </SPAN></P></DIV></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
- <span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>The feature class uses the </SPAN><A href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><SPAN>ExtendTable function </SPAN></A><SPAN>used from the DA module of arcpy to join a modifed structured numpy array with column-wise group IDs joined to it. </SPAN></P></DIV></DIV></DIV></td>
+ <span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>The feature class uses the </SPAN><A href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><SPAN>ExtendTable function </SPAN></A><SPAN>used from the DA module of arcpy to join a modified structured numpy array with column-wise group IDs joined to it. </SPAN></P></DIV></DIV></DIV></td>
  <td class="info" align="left">Feature Layer</td>
  </tr>
  <tr>
  <td class="info">Fields_to_Group</td>
  <td class="info" align="left">
- <span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>These are the fields you want unique group categories of. It can be used to make a unique ID out of serveral different field attributes. </SPAN></P></DIV></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
+ <span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>These are the fields you want unique group categories of. It can be used to make a unique ID out of several different field attributes. </SPAN></P></DIV></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
  <span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><DIV><P><SPAN>Uses dynamic query creation to generate isolated numpy arrays to join to the input table. </SPAN></P></DIV></DIV></DIV></td>
  <td class="info" align="left">Multiple Value</td>
  </tr>
  <tr>
  <td class="info">Base_Name</td>
  <td class="info" align="left">
- <span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the string that is prepended to the the new field names. The field name will be this basename  along with either the strings "Num" or "String" appended to the end. </SPAN></P></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
+ <span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the string that is prepended to the the new field names. The field name will be this base name  along with either the strings "Num" or "String" appended to the end. </SPAN></P></DIV></DIV><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br />
  <span style="font-weight: bold">Python Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>The fields will validated based on the work space. </SPAN></P></DIV></DIV></td>
  <td class="info" align="left">String</td>
  </tr>
@@ -227,37 +227,37 @@ Use this script with an input date field to create a formated time string based 
 <tr>
 <td class="info">Set_Year</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the year you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the year you want to set all the datetimes to for the new field. If it is -1, it will use the current time period determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 <tr>
 <td class="info">Set_Month</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the month you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV><DIV><P><SPAN /></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the month you want to set all the datetimes to for the new field. If it is -1, it will use the current time period determined by the datetime object. </SPAN></P></DIV><DIV><P><SPAN /></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 <tr>
 <td class="info">Set_Day</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the day you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV><DIV><P><SPAN /></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the day you want to set all the datetimes to for the new field. If it is -1, it will use the current time period determined by the datetime object. </SPAN></P></DIV><DIV><P><SPAN /></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 <tr>
 <td class="info">Set_Hour</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the hour you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV><DIV><P><SPAN /></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the hour you want to set all the datetimes to for the new field. If it is -1, it will use the current time period determined by the datetime object. </SPAN></P></DIV><DIV><P><SPAN /></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 <tr>
 <td class="info">Set_Minute</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the minute you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the minute you want to set all the datetimes to for the new field. If it is -1, it will use the current time period determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 <tr>
 <td class="info">Set_Second</td>
 <td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the second you want to set all the datetimes to for the new field. If it is -1, it will use the current timeperiod determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
+<span style="font-weight: bold">Dialog Reference</span><br /><DIV STYLE="text-align:Left;"><DIV><P><SPAN>This is the second you want to set all the datetimes to for the new field. If it is -1, it will use the current time period determined by the datetime object. </SPAN></P></DIV></DIV><p><span class="noContent">There is no python reference for this parameter.</span></p></td>
 <td class="info" align="left">Long</td>
 </tr>
 </tbody>
