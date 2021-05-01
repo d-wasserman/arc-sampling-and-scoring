@@ -146,7 +146,7 @@ The goal of this script is to enable analysis of demographic or other area based
 <td class="info">Sampling_Features</td>
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>The sampling features are the features you want to associate proportional averages or sums from the attributes in the base features. The output will look like this input polygon layer with new fields.</span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><div><p><span>The feature class uses the </span><a href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><span>ExtendTable function </span></a><span>used from the DA module of arcpy to join a modified structured numpy array with column-wise calculated Z scores joined to it. </span></p></div></div></div></td>
+</p></div></div></div></td>
 <td class="info" align="left">Feature Layer</td>
 </tr>
 <tr>
@@ -154,7 +154,7 @@ The goal of this script is to enable analysis of demographic or other area based
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The base features have the attributes being sampled by the polygon sampling features.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+</p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
  <tr>
@@ -162,7 +162,7 @@ The goal of this script is to enable analysis of demographic or other area based
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The output feature class is a copy of the sampling features with new sum & average field.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+</p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
  <tr>
@@ -170,7 +170,7 @@ The goal of this script is to enable analysis of demographic or other area based
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Fields to proportionally sum (based on the overlapping areas between the sampling and base features) from the base to the sampling features.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+<</p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
  <tr>
@@ -178,7 +178,7 @@ The goal of this script is to enable analysis of demographic or other area based
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Fields to proportionally average (based on the overlapping areas between the sampling and base features from the base to the sampling features.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+</p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
 </tbody>
