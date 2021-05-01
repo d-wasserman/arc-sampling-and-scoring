@@ -170,10 +170,10 @@ The goal of this script is to enable analysis of demographic or other area based
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Fields to proportionally sum (based on the overlapping areas between the sampling and base features) from the base to the sampling features.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<</p></div></div></td>
+</p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
- <tr>
+<tr>
 <td class="info">Mean Fields</td>
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Fields to proportionally average (based on the overlapping areas between the sampling and base features from the base to the sampling features.
