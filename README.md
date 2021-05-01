@@ -2,7 +2,7 @@
 A set of ArcGIS tools that use Numpy and Pandas to help with different data analysis tasks such as standardizing data and creating group IDs. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below. 
 
 # ArcNumerical TBX
-# StandarizeFields Summary
+# Standarize Fields Summary
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
 The goal of this script is to add new fields with standardized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
@@ -40,7 +40,7 @@ The goal of this script is to add new fields with standardized Z Scores for ever
 </table>
 
 
-# CreateClassField Summary
+# Create Class Field Summary
  This scripting tool is designed to take selected fields and create an added field that classifies based on their unique combinations of values using numpy.
 # Usage
  The goal of this script is to add a group field based on a selection of fields chosen in the tool. Two fields will be added, one with a number representing the group ID (can be dissolved or summarized on), and another with a string with the query used to isolate it. The names of the fields are based on the base name parameter. 
@@ -85,7 +85,7 @@ The goal of this script is to add new fields with standardized Z Scores for ever
  </table>
  </div>
 
-# PercentileFields Summary
+# Percentile Fields Summary
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a percentile score for each one of the selected fields. 
 # Usage
 The goal of this script is to add new fields with percentile scores for every field selected. The percentile scores
@@ -118,6 +118,67 @@ are based on the values of each column, so they will change depending on the ext
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the fields that percentiles scores added to the input feature class will be based. 
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
 <span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span>Generally the fields are selected from the feature class to be converted into a numpy array, then into a pandas data frame, then back to structured numpy array to be joined based on the object ID. This tool assumes there is an object ID to use to join to. </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+</tbody>
+</table>
+
+# Proportional Allocation Summary
+This tool intended to provide a way to use sampling geography that will calculate proportional averages or sums based on the percentage of an intersection covered by the sampling geography. The output is  the sampling geography with fields sampled from the base features.
+# Usage
+The goal of this script is to enable analysis of demographic or other area based data based on arbitrary sampling polygons. 
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Sampling_Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>The sampling features are the features you want to associate proportional averages or sums from the attributes in the base features. The output will look like this input polygon layer with new fields.</span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><div><p><span>The feature class uses the </span><a href="http://pro.arcgis.com/en/pro-app/arcpy/data-access/extendtable.htm"><span>ExtendTable function </span></a><span>used from the DA module of arcpy to join a modified structured numpy array with column-wise calculated Z scores joined to it. </span></p></div></div></div></td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Base Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The base features have the attributes being sampled by the polygon sampling features.
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+ <tr>
+<td class="info">Output Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The output feature class is a copy of the sampling features with new sum & average field.
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+ <tr>
+<td class="info">Sum Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Fields to proportionally sum (based on the overlapping areas between the sampling and base features) from the base to the sampling features.
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+ <tr>
+<td class="info">Mean Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Fields to proportionally average (based on the overlapping areas between the sampling and base features from the base to the sampling features.
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span> </span></p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
 </tbody>
@@ -186,7 +247,7 @@ densities will be associated with. Zero values will be turned into nulls.
  
 # ArcTime TBX
 
-# TruncateDatetime
+# Truncate Datetime
 This tool is a simple geoprocessing scripting tool intended to assist with temporal data preparation by truncating the date time object to set constants for better grouping and aggregation for time space cubes and other analysis methods. If the set times are -1, the current date and time will be used for that parameter.  
 
 # Usage
@@ -264,7 +325,7 @@ Use this script with an input date field to create a formated time string based 
 </tbody>
 </table>
 
-# AddTimeStringField
+# Add Time String Field
 
 This tool is a simple strf time script intended to add a new text field with a formatted string based on the format string input into it. This tool uses pandas to convert and add the new unique field using the arcpy.da extend table function.
 
@@ -314,7 +375,7 @@ This tool is intended to provide an easy way to created formatted string fields 
 </tbody>
 </table>
 
-# RoundDateTime
+# Round DateTime
 This tool is a simple geoprocessing scripting tool intended to assist with temporal data preparation by rounding the datetime field to the nearest unit placed in the respective time settings.
 # Usage
 If the round times are -1, the current date and time will be used for that parameter. The smallest unit to not have a -1 will be used as an indicator that the other units below it should be set to 0.
@@ -393,7 +454,7 @@ If the round times are -1, the current date and time will be used for that param
 </table>
 </div>
 
-# TemporalSplit
+# Temporal Split
 This tool is a simple geoprocessing scripting tool intended to split a feature class based on a time field or a start or end time into multiple feature classes based on a start or end time. The bins are based on a time interval and a predetermined start time.
 # Usage
 This tool is used to split a feature class based on time interval. After being split, iterators in model builder can be used to do aggregation, kernel densities, and other geoprocessing operations.
