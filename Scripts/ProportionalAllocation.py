@@ -77,10 +77,10 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
     inter_df[ratio_coverage] = inter_df[inter_area_col].fillna(0) / inter_df[base_area_col].fillna(1)
     all_stats = sum_fields + mean_fields
     for field in all_stats:
-        inter_df[field] = inter_df[field] * inter_df[ratio_coverage]  # Weight X Value
+        inter_df[field] = inter_df[field].fillna(0) * inter_df[ratio_coverage].fillna(0)  # Weight X Value
     inter_groups = inter_df.groupby(sampling_id).sum()
     for mean in mean_fields:
-        inter_groups[mean] = inter_groups[mean] / inter_groups[ratio_coverage]  # Divide by sum of weights for wm
+        inter_groups[mean] = inter_groups[mean].fillna(0) / inter_groups[ratio_coverage].fillna(1)  # Divide by sum of weights for wm
     san.arc_print("Associating results to sampled SEDF...")
     samp_df = pd.DataFrame.spatial.from_featureclass(sampling_features)
     samp_df = samp_df.merge(inter_groups, how="left", left_on=sampling_id, right_index=True,
