@@ -75,22 +75,23 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
     all_fields = [sampling_id, inter_area_col, base_area_col] + agg_fields
     inter_df = san.arcgis_table_to_df(temp_intersect, all_fields)
     inter_df[ratio_coverage] = inter_df[inter_area_col].fillna(0) / inter_df[base_area_col].fillna(1)
-    all_stats = sum_fields + mean_fields
-    for field in all_stats:
-        inter_df[str(field)] = inter_df[field] * inter_df[ratio_coverage]  # Weight X Valu
-    inter_groups = inter_df.groupby(sampling_id).sum()
-    for mean in mean_fields:
-        inter_groups["MEAN_" + str(mean)] = inter_groups[mean] / inter_groups[
-            ratio_coverage]  # Divide by sum of weights for wm
-    sum_rename = {i: "SUM_" + str(i) for i in sum_fields}
-    inter_groups = inter_groups.rename(columns=sum_rename)
+    sum_cols = ["SUM_" + str(i) for i in sum_fields]
+    for input, sum in zip(sum_fields, sum_cols):
+        inter_df[sum] = inter_df[input] * inter_df[ratio_coverage]  # Weight X Value
+    inter_groups_sum = inter_df.groupby(sampling_id).sum()
+    mean_cols = ["MEAN_" + str(i) for i in mean_fields]
+    for input, mean in zip(mean_fields, mean_cols):
+        inter_df[mean] = inter_df[input] * inter_df[inter_area_col]  # (Weight X Value) / SUM(weights)
+    inter_groups_avg = inter_df.groupby(sampling_id).sum()
+    for mean in mean_cols:
+        inter_groups_avg[mean] = inter_groups_avg[mean]/inter_groups_avg[inter_area_col]
+    inter_groups = inter_groups_sum.merge(inter_groups_avg[mean_cols], how="left", left_index=True, right_index=True)
     san.arc_print("Associating results to sampled SEDF...")
     samp_df = pd.DataFrame.spatial.from_featureclass(sampling_features)
     samp_df = samp_df.merge(inter_groups, how="left", left_on=sampling_id, right_index=True,
                             suffixes=("DELETE_X", "DELETE_Y"))
-    kept_cols = [i for i in samp_df.columns if "DELETE" not in i and i not in all_stats]
+    kept_cols = [i for i in samp_df.columns if "DELETE" not in str(i) and str(i) not in agg_fields]
     samp_df = samp_df[kept_cols].copy()
-    san.arc_print(kept_cols)
     san.arc_print("Exporting results...", True)
     samp_df.spatial.to_featureclass(out_feature_class)
     san.arc_print("Script Completed Successfully.", True)
