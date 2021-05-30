@@ -51,7 +51,6 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
      mean_fields - Fields to proportionally average (based on the overlapping areas between the sampling and base features)
      from the base to the sampling features.
      """
-    # try:
     arcpy.env.overwriteOutput = True
     # Start Analysis
     temp_intersect = os.path.join("in_memory", "temp_intersect")
@@ -72,34 +71,29 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
     san.arc_print("Calculating proportional sums and/or averages...", True)
     sum_fields = [i for i in sum_fields if san.field_exist(temp_intersect, i)]
     mean_fields = [i for i in mean_fields if san.field_exist(temp_intersect, i)]
-    all_fields = [sampling_id, inter_area_col, base_area_col] + sum_fields + mean_fields
+    agg_fields = list(set(sum_fields + mean_fields))
+    all_fields = [sampling_id, inter_area_col, base_area_col] + agg_fields
     inter_df = san.arcgis_table_to_df(temp_intersect, all_fields)
     inter_df[ratio_coverage] = inter_df[inter_area_col].fillna(0) / inter_df[base_area_col].fillna(1)
     all_stats = sum_fields + mean_fields
     for field in all_stats:
-        inter_df[field] = inter_df[field].fillna(0) * inter_df[ratio_coverage].fillna(0)  # Weight X Value
+        inter_df[str(field)] = inter_df[field] * inter_df[ratio_coverage]  # Weight X Valu
     inter_groups = inter_df.groupby(sampling_id).sum()
     for mean in mean_fields:
-        inter_groups[mean] = inter_groups[mean].fillna(0) / inter_groups[ratio_coverage].fillna(1)  # Divide by sum of weights for wm
+        inter_groups["MEAN_" + str(mean)] = inter_groups[mean] / inter_groups[
+            ratio_coverage]  # Divide by sum of weights for wm
+    sum_rename = {i: "SUM_" + str(i) for i in sum_fields}
+    inter_groups = inter_groups.rename(columns=sum_rename)
     san.arc_print("Associating results to sampled SEDF...")
     samp_df = pd.DataFrame.spatial.from_featureclass(sampling_features)
     samp_df = samp_df.merge(inter_groups, how="left", left_on=sampling_id, right_index=True,
                             suffixes=("DELETE_X", "DELETE_Y"))
-    kept_cols = [i for i in samp_df.columns if "DELETE" not in i]
+    kept_cols = [i for i in samp_df.columns if "DELETE" not in i and i not in all_stats]
     samp_df = samp_df[kept_cols].copy()
-    sum_rename = {i:"SUM_"+str(i) for i in sum_fields}
-    mean_rename = {i: "MEAN_" + str(i) for i in mean_fields}
-    sum_rename.update(mean_rename)
-    samp_df = samp_df.rename(columns=sum_rename)
+    san.arc_print(kept_cols)
     san.arc_print("Exporting results...", True)
     samp_df.spatial.to_featureclass(out_feature_class)
     san.arc_print("Script Completed Successfully.", True)
-    # except arcpy.ExecuteError:
-    #     san.arc_print(arcpy.GetMessages(2))
-    #     arcpy.AddError(arcpy.GetMessages(2))
-    # except Exception as e:
-    #     san.arc_print(e.args[0])
-    #     arcpy.AddError(e.args[0])
 
 
 # End do_analysis function
