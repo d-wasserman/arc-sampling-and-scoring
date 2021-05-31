@@ -21,23 +21,37 @@
 # limitations under the License.
 # --------------------------------
 # Import Modules
-import os, arcpy, datetime
-import SharedArcNumericalLib as san
+import arcpy
+import datetime
 import numpy as np
+import os
 import pandas as pd
 from scipy import stats
+
+import SharedArcNumericalLib as san
 
 
 # Function Definitions
 
 
-def add_percentile_fields(in_fc, input_fields, ignore_nulls=True):
+def add_percentile_fields(in_fc, input_fields, percentile_method="average", ignore_nulls=True):
     """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy.
     Parameters
     -----------------
     in_fc- input feature class to add percentile fields
     input_fields - table fields to percentile score
+    percentile_method - {‘average’, ‘min’, ‘max’, ‘dense’, ‘ordinal’}, optional
+        The method used to assign percentile ranks to tied elements.
+        The following methods are available (default is ‘average’):
+        ‘average’: The average of the ranks that would have been assigned to all the tied values is assigned to each
+        value.
+        ‘min’: The minimum of the ranks that would have been assigned to all the tied values is assigned to each value.
+         (This is also referred to as “competition” ranking.)
+        ‘max’: The maximum of the ranks that would have been assigned to all the tied values is assigned to each value.
+        ‘dense’: Like ‘min’, but the rank of the next highest element is assigned the rank immediately after those
+        assigned to the tied elements.
+        ‘ordinal’: All values are given a distinct rank, corresponding to the order that the values occur in a.
     ignore_nulls - ignore null values in percentile calculations
     """
     try:
@@ -53,7 +67,7 @@ def add_percentile_fields(in_fc, input_fields, ignore_nulls=True):
                 field_series = san.arcgis_table_to_dataframe(in_fc, [column], skip_nulls=ignore_nulls)
                 san.arc_print("Creating percentile column for field {0}.".format(str(column)), True)
                 col_per_score = arcpy.ValidateFieldName("Perc_" + column, workspace)
-                field_series[col_per_score] = stats.rankdata(field_series, "average") / len(field_series)
+                field_series[col_per_score] = stats.rankdata(field_series, percentile_method) / len(field_series)
                 finalColumnList.append(col_per_score)
                 if col_per_score != column:
                     del field_series[column]
@@ -93,4 +107,4 @@ if __name__ == '__main__':
     FeatureClass = arcpy.GetParameterAsText(0)
     InputFields = arcpy.GetParameterAsText(1).split(";")
     IgnoreNulls = bool(arcpy.GetParameter(2))
-    add_percentile_fields(FeatureClass, InputFields, IgnoreNulls)
+    add_percentile_fields(FeatureClass, InputFields, ignore_nulls=IgnoreNulls)
