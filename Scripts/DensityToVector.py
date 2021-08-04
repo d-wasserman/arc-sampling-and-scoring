@@ -66,9 +66,9 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         # Start Analysis
         desc = arcpy.Describe(input_network)
         work_space = desc.catalogPath
-        arcpy.env.scratchWorkspace = "in_memory"
-        temp_out_sample = "in_memory/sample_points_out"
-        temp_sample_points = "in_memory/sample_points"
+        arcpy.env.scratchWorkspace = "memory"
+        temp_out_sample = "memory/sample_points_out"
+        temp_sample_points = "memory/sample_points"
         temp_input_layer = "Temp_Input_Layer"
         join_field = "JNField"
         join_index = "JNindex"
