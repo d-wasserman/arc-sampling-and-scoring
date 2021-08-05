@@ -190,7 +190,7 @@ them with a target vector file, and computing percentile scores of non-zero/null
 cartography and analysis on networks and other vector data. 
 
 # Usage
-The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step.  
+The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step. This tool leverages memory workspaces only usable in ArcGIS Pro, and it will no longer operate in ArcMap.  
 
 # Parameters
 <table width="100%" border="0" cellpadding="5">
