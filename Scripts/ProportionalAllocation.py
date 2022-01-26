@@ -4,10 +4,10 @@
 # averages or sums based on the percentage of an intersection covered by the sampling geography. The output is
 # the sampling geography with fields sampled from the base features.
 # Current Owner: David Wasserman
-# Last Modified: 4/17/2021
+# Last Modified: 1/25/2022
 # Copyright:   David Wasserman
 # ArcGIS Version:   ArcGIS Pro
-# Python Version:   3.6
+# Python Version:   3.8
 # --------------------------------
 # Copyright 2021 David J. Wasserman
 #
