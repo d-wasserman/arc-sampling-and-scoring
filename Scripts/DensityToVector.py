@@ -5,10 +5,10 @@
 # a network feature class. If provided a list of numbers, the tool will compute percentiles of the input densities
 # and will add percentile scores to the input densities for non-zero/non-null values.
 # Current Owner: David Wasserman
-# Last Modified: 4/16/2021
+# Last Modified: 1/25/2022
 # Copyright:   David Wasserman
 # ArcGIS Version:   ArcGIS Pro/10.4
-# Python Version:   3.5/2.7
+# Python Version:   3.8/2.7
 # --------------------------------
 # Copyright 2017 David J. Wasserman
 #
@@ -28,6 +28,7 @@
 # Import Modules
 import arcpy
 import numpy as np
+
 import SharedArcNumericalLib as san
 
 try:
@@ -45,7 +46,7 @@ except:
 
 
 def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=True, field_edit="", cell_size=500,
-                      search_radius=800, area_unit="SQUARE_MILES",sample_percentage=25,group_by_statistic="MEAN"):
+                      search_radius=800, area_unit="SQUARE_MILES", sample_percentage=25, group_by_statistic="median"):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
      percentile bool is true, percentile scores are added along side each density.
      Parameters
@@ -59,8 +60,10 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
      search_radius: search radius/bandwith of KDE
      area_unit: unit of output raster
      sample_percentage: determine sample points to use in polyline files. 10 will given 1 point every 10% of the line.
-     Includes stop and end points.
-     group_by_statistic: if multiple sample points are used, this is the statistic used to aggregate it"""
+        Includes stop and end points.
+     group_by_statistic: if multiple sample points are used, this is the statistic used to aggregate it, based
+             on options accepted by agg function in pandas:
+             https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.agg.html."""
     try:
         arcpy.env.overwriteOutput = True
         # Start Analysis
@@ -73,10 +76,10 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         join_field = "JNField"
         join_index = "JNindex"
         oid_field = str(desc.OIDFieldName)
-        san.add_new_field(input_network,join_field,"LONG")
-        arcpy.CalculateField_management(input_network,join_field,"!{0}!".format(oid_field),"PYTHON")
+        san.add_new_field(input_network, join_field, "LONG")
+        arcpy.CalculateField_management(input_network, join_field, "!{0}!".format(oid_field), "PYTHON")
         san.arc_print("Generating sample points from feature class in memory...")
-        san.generate_sample_points(input_network,temp_sample_points,int(sample_percentage))
+        san.generate_sample_points(input_network, temp_sample_points, int(sample_percentage))
         final_df = None
         for field in weighted_fields:
             san.arc_print("Computing density for field {0}...".format(field))
@@ -85,7 +88,7 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
                                                                                noneEqualityOperator="is not"))
             output_kde = arcpy.sa.KernelDensity(in_fc, str(field), cell_size, search_radius, area_unit)
             arcpy.sa.ExtractValuesToPoints(temp_sample_points, output_kde, temp_out_sample, True)
-            raw_sample_df = san.arcgis_table_to_dataframe(temp_out_sample, [join_field,"RASTERVALU"])
+            raw_sample_df = san.arcgis_table_to_dataframe(temp_out_sample, [join_field, "RASTERVALU"])
             new_field_name = "DN_" + str(field_edit) + str(field)
             raw_sample_df[new_field_name] = raw_sample_df["RASTERVALU"]
             raw_sample_df[new_field_name].replace([0], np.NaN, inplace=True)
@@ -105,7 +108,7 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         fin_records = final_df.to_records()
         arcpy.da.ExtendTable(input_network, join_field, fin_records, join_index, append_only=False)
         san.arc_print("Deleteing temporary join field...")
-        arcpy.DeleteField_management(input_network,[join_field,join_index])
+        arcpy.DeleteField_management(input_network, [join_field, join_index])
         san.arc_print("Script Completed Successfully.", True)
 
     except arcpy.ExecuteError:
@@ -133,4 +136,4 @@ if __name__ == '__main__':
     percentage_sample = arcpy.GetParameter(8)
     group_by_stat = arcpy.GetParameter(9)
     density_to_vector(input_feature_class, weighted_fields, input_network, bool(percentile_bool), field_edit, cell_size,
-                      search_radius, area_unit_factor,percentage_sample,group_by_stat)
+                      search_radius, area_unit_factor, percentage_sample, group_by_stat)
