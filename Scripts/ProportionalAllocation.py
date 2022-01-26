@@ -55,13 +55,13 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
     # Start Analysis
     temp_intersect = os.path.join("in_memory", "temp_intersect")
     san.arc_print("Calculating original areas...")
-    base_area_col = "Base_Area_SQMI"
-    inter_area_col = "Inter_Area_SQMI"
-    sampling_id = "Sampling_ID"
+    base_area_col = "base_area_sqmi"
+    inter_area_col = "inter_area_sqmi"
+    sampling_id = "sampling_id"
     ratio_coverage = "Proportion"
     san.add_new_field(base_features, base_area_col, "DOUBLE")
     arcpy.CalculateField_management(base_features, base_area_col, "!shape.area@SQUAREMILES!")
-    san.add_new_field(sampling_features, "Sampling_ID", "LONG")
+    san.add_new_field(sampling_features, sampling_id, "LONG")
     oid_s = arcpy.Describe(sampling_features).OIDFieldName
     arcpy.CalculateField_management(sampling_features, sampling_id, "!{0}!".format(oid_s))
     san.arc_print("Conducting an intersection...", True)
@@ -89,8 +89,8 @@ def proportional_allocation(sampling_features, base_features, out_feature_class,
     san.arc_print("Associating results to sampled SEDF...")
     samp_df = pd.DataFrame.spatial.from_featureclass(sampling_features)
     samp_df = samp_df.merge(inter_groups, how="left", left_on=sampling_id, right_index=True,
-                            suffixes=("DELETE_X", "DELETE_Y"))
-    kept_cols = [i for i in samp_df.columns if "DELETE" not in str(i) and str(i) not in agg_fields]
+                            suffixes=("", "DELETE_Y"))
+    kept_cols = [i for i in samp_df.columns if "DELETE" not in str(i) and i != "index" and str(i) not in agg_fields]
     samp_df = samp_df[kept_cols].copy()
     san.arc_print("Exporting results...", True)
     samp_df.spatial.to_featureclass(out_feature_class)
