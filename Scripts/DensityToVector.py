@@ -46,7 +46,8 @@ except:
 
 
 def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=True, field_edit="", cell_size=500,
-                      search_radius=800, area_unit="SQUARE_MILES", sample_percentage=25, group_by_statistic="median"):
+                      search_radius=800, area_unit="SQUARE_MILES", sample_percentage=25, group_by_statistic="median"
+                      , barrier_fc = ""):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
      percentile bool is true, percentile scores are added along side each density.
      Parameters
@@ -63,7 +64,9 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         Includes stop and end points.
      group_by_statistic: if multiple sample points are used, this is the statistic used to aggregate it, based
              on options accepted by agg function in pandas:
-             https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.agg.html."""
+             https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.agg.html.
+     barrier_fc: a feature class (line or polygon) that defines a barrier for KDE estimation.
+     """
     try:
         arcpy.env.overwriteOutput = True
         # Start Analysis
@@ -86,7 +89,8 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
             arcpy.MakeFeatureLayer_management(in_fc, temp_input_layer,
                                               san.construct_sql_equality_query(field, None, work_space,
                                                                                noneEqualityOperator="is not"))
-            output_kde = arcpy.sa.KernelDensity(in_fc, str(field), cell_size, search_radius, area_unit)
+            output_kde = arcpy.sa.KernelDensity(in_fc, str(field), cell_size, search_radius, area_unit,
+                                                in_barriers = barrier_fc)
             arcpy.sa.ExtractValuesToPoints(temp_sample_points, output_kde, temp_out_sample, True)
             raw_sample_df = san.arcgis_table_to_dataframe(temp_out_sample, [join_field, "RASTERVALU"])
             new_field_name = "DN_" + str(field_edit) + str(field)
@@ -135,5 +139,6 @@ if __name__ == '__main__':
     area_unit_factor = arcpy.GetParameter(7)
     percentage_sample = arcpy.GetParameter(8)
     group_by_stat = arcpy.GetParameter(9)
+    barrier_fc = arcpy.GetParameterAsText(10)
     density_to_vector(input_feature_class, weighted_fields, input_network, bool(percentile_bool), field_edit, cell_size,
-                      search_radius, area_unit_factor, percentage_sample, group_by_stat)
+                      search_radius, area_unit_factor, percentage_sample, group_by_stat, barrier_fc)

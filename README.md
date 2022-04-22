@@ -242,6 +242,13 @@ densities will be associated with. Zero values will be turned into nulls.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
 <td class="info" align="left">Multiple Values</td>
 </tr>
+<tr>
+<td class="info">Barrier Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The dataset that defines the barriers for KDE estimation (impacts shortest distances). The barriers can be a feature layer of polyline or polygon features. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Multiple Values</td>
+</tr>
 </tbody>
 </table>
  
