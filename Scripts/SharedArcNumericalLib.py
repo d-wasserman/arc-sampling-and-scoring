@@ -280,6 +280,34 @@ def generate_sample_points(in_fc,out_fc,sample_percentage=10):
         arcpy.FeatureToPoint_management(in_fc, out_fc, True)
     return out_fc
 
+def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill=.5, invert=False, pct=True):
+    """When passed a dataframe and fields to score, this function will return a percentile score (pct rank) based on the
+    settings passed to the function including how to fill in na values or whether to invert the metric.
+    :param dataframe: dataframe that will be returned with new scored fields
+    :param fields_to_score: list of columns to score
+    :param method: {‘average’, ‘min’, ‘max’, ‘first’, ‘dense’}
+        average: average rank of group
+        min: lowest rank in group
+        max: highest rank in group
+        first: ranks assigned in order they appear in the array
+        dense: like ‘min’, but rank always increases by 1 between groups
+    :na_fill: float
+        Will fill kept null values with the chosen value. Defaults to .5
+    :invert : boolean
+        Will make lower values be scored as higher values
+    pct:  boolean, default True
+        Computes percentage rank of data"""
+    for field in fields_to_score:
+        try:
+            new_score = "{0}_Score".format(field)
+            if not invert:
+                dataframe[new_score] = dataframe[field].rank(method=method, pct=pct).fillna(value=na_fill)
+            else:
+                dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=False).fillna(
+                    value=na_fill)
+        except:
+            logging.error("WARNING:Could not score column {0}. Check input dataframe.".format(field))
+    return dataframe
 ###########################
 # ArcTime
 ###########################
