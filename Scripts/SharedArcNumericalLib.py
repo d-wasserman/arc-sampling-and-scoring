@@ -160,25 +160,41 @@ def validate_df_names(dataframe, output_feature_class_workspace):
 
 
 @arc_tool_report
-def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
+def arcgis_table_to_df(in_fc, input_fields=None, query=""):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
-    input fields."""
+    input fields using an arcpy.da.SearchCursor.
+    :param - in_fc - input feature class or table to convert
+    :param - input_fields - fields to input to a da search cursor for retrieval
+    :param - query - sql query to grab appropriate values
+    :returns - pandas.DataFrame"""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_fields = [OIDFieldName] + input_fields
-    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
-    object_id_index = np_array[OIDFieldName]
-    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
+    if input_fields:
+        final_fields = [OIDFieldName] + input_fields
+    else:
+        final_fields = [field.name for field in arcpy.ListFields(in_fc)]
+    data = [row for row in arcpy.da.SearchCursor(in_fc,final_fields,where_clause=query)]
+    fc_dataframe = pd.DataFrame(data,columns=final_fields)
+    fc_dataframe = fc_dataframe.set_index(OIDFieldName,drop=True)
     return fc_dataframe
 
 @arc_tool_report
-def arcgis_table_to_df(in_fc,input_fields,query=""):
+def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
     """Function will convert an arcgis table into a pandas dataframe with an object ID index, and the selected
-        input fields. Uses a da search cursor."""
+    input fields. Uses TableToNumPyArray to get initial data.
+    :param - in_fc - input feature class or table to convert
+    :param - input_fields - fields to input into a da numpy converter function
+    :param - query - sql like query to filter out records returned
+    :param - skip_nulls - skip rows with null values
+    :param - null_values - values to replace null values with.
+    :returns - pandas dataframe"""
     OIDFieldName = arcpy.Describe(in_fc).OIDFieldName
-    final_fields = [OIDFieldName] + input_fields
-    record_list = [row for row in arcpy.da.SearchCursor(in_fc,final_fields,query)]
-    oid_collection = [row[0] for row in record_list]
-    fc_dataframe = pd.DataFrame(record_list, index=oid_collection, columns=final_fields)
+    if input_fields:
+        final_fields = [OIDFieldName] + input_fields
+    else:
+        final_fields = [field.name for field in arcpy.ListFields(in_fc)]
+    np_array = arcpy.da.TableToNumPyArray(in_fc, final_fields, query, skip_nulls, null_values)
+    object_id_index = np_array[OIDFieldName]
+    fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
     return fc_dataframe
 
 @arc_tool_report
@@ -268,6 +284,8 @@ def generate_statistical_fieldmap(target_features, join_features, prepended_name
             field_mappings.addFieldMap(new_field_map)
     return field_mappings
 
+
+@arc_tool_report
 def generate_sample_points(in_fc,out_fc,sample_percentage=10):
     """This will take in a feature class and return a feature class of points. Polygons and points have feature to point
     used, and line files have sample points created along the line in lengths an equal distance apart as close to the
@@ -280,6 +298,7 @@ def generate_sample_points(in_fc,out_fc,sample_percentage=10):
         arcpy.FeatureToPoint_management(in_fc, out_fc, True)
     return out_fc
 
+@arc_tool_report
 def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill=.5, invert=False, pct=True):
     """When passed a dataframe and fields to score, this function will return a percentile score (pct rank) based on the
     settings passed to the function including how to fill in na values or whether to invert the metric.
