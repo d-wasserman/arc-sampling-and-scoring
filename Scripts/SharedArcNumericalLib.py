@@ -172,10 +172,11 @@ def arcgis_table_to_df(in_fc, input_fields=None, query=""):
         final_fields = [OIDFieldName] + input_fields
     else:
         final_fields = [field.name for field in arcpy.ListFields(in_fc)]
-    data = [row for row in arcpy.da.SearchCursor(in_fc,final_fields,where_clause=query)]
-    fc_dataframe = pd.DataFrame(data,columns=final_fields)
-    fc_dataframe = fc_dataframe.set_index(OIDFieldName,drop=True)
+    data = [row for row in arcpy.da.SearchCursor(in_fc, final_fields, where_clause=query)]
+    fc_dataframe = pd.DataFrame(data, columns=final_fields)
+    fc_dataframe = fc_dataframe.set_index(OIDFieldName, drop=True)
     return fc_dataframe
+
 
 @arc_tool_report
 def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, null_values=None):
@@ -196,6 +197,7 @@ def arcgis_table_to_dataframe(in_fc, input_fields, query="", skip_nulls=False, n
     object_id_index = np_array[OIDFieldName]
     fc_dataframe = pd.DataFrame(np_array, index=object_id_index, columns=input_fields)
     return fc_dataframe
+
 
 @arc_tool_report
 def arc_unique_values(table, field, filter_falsy=False):
@@ -286,17 +288,19 @@ def generate_statistical_fieldmap(target_features, join_features, prepended_name
 
 
 @arc_tool_report
-def generate_sample_points(in_fc,out_fc,sample_percentage=10):
+def generate_sample_points(in_fc, out_fc, sample_percentage=10):
     """This will take in a feature class and return a feature class of points. Polygons and points have feature to point
     used, and line files have sample points created along the line in lengths an equal distance apart as close to the
     distance set in this function in the units of the current projection."""
-    describe_obj= arcpy.Describe(in_fc)
-    shape_type= str(describe_obj.shapeType)
-    if shape_type=="Polyline":
-        arcpy.GeneratePointsAlongLines_management(in_fc,out_fc,"PERCENTAGE",None,int(sample_percentage),'END_POINTS')
+    describe_obj = arcpy.Describe(in_fc)
+    shape_type = str(describe_obj.shapeType)
+    if shape_type == "Polyline":
+        arcpy.GeneratePointsAlongLines_management(in_fc, out_fc, "PERCENTAGE", None, int(sample_percentage),
+                                                  'END_POINTS')
     else:
         arcpy.FeatureToPoint_management(in_fc, out_fc, True)
     return out_fc
+
 
 @arc_tool_report
 def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill=.5, invert=False, pct=True):
@@ -319,16 +323,15 @@ def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill
     for field in fields_to_score:
         try:
             new_score = "{0}_PCT_SCR".format(field)
-            if not invert:
-                dataframe[new_score] = dataframe[field].rank(method=method, pct=pct).fillna(value=na_fill)
-            else:
-                dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=False).fillna(
-                    value=na_fill)
+            ascending_order = False if invert else True
+            dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
+                value=na_fill)
         except:
             arcpy.AddWarning("WARNING:Could not score column {0}. Check input dataframe.".format(field))
-            logging.error("WARNING:Could not score column {0}. Check input dataframe.".format(field))
 
     return dataframe
+
+
 ###########################
 # ArcTime
 ###########################
