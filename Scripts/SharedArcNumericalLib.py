@@ -301,13 +301,14 @@ def generate_sample_points(in_fc, out_fc, sample_percentage=10):
         arcpy.FeatureToPoint_management(in_fc, out_fc, True)
     return out_fc
 
-
-@arc_tool_report
-def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill=.5, invert=False, pct=True):
+def generate_percentile_metric(dataframe, fields_to_score, ranking_group=None,
+                               method="max", na_fill=.5, invert=False, pct=True):
     """When passed a dataframe and fields to score, this function will return a percentile score (pct rank) based on the
     settings passed to the function including how to fill in na values or whether to invert the metric.
     :param dataframe: dataframe that will be returned with new scored fields
     :param fields_to_score: list of columns to score
+    :param ranking_group: unique values in a column are used to group the percentile scores so
+        they are ranked relative to the values in each group.
     :param method: {‘average’, ‘min’, ‘max’, ‘first’, ‘dense’}
         average: average rank of group
         min: lowest rank in group
@@ -321,14 +322,15 @@ def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill
     pct:  boolean, default True
         Computes percentage rank of data"""
     for field in fields_to_score:
-        try:
-            new_score = "{0}_PCT_SCR".format(field)
-            ascending_order = False if invert else True
+        new_score = "{0}_PCT_SCR".format(field)
+        ascending_order = False if invert else True
+        if ranking_group is None:
             dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
                 value=na_fill)
-        except:
-            arcpy.AddWarning("WARNING:Could not score column {0}. Check input dataframe.".format(field))
-
+        else:
+            grp = dataframe.groupby(ranking_group)
+            dataframe[new_score] = grp[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
+                value=na_fill)
     return dataframe
 
 
