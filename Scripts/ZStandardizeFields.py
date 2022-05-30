@@ -74,10 +74,11 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
         arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
         san.arc_print("Script Completed Successfully.", True)
 
+
     except arcpy.ExecuteError:
-        san.arc_print(arcpy.GetMessages(2))
+        arcpy.AddError(arcpy.GetMessages(2))
     except Exception as e:
-        san.arc_print(e.args[0])
+        arcpy.AddError(e.args[0])
 
         # End do_analysis function
 
