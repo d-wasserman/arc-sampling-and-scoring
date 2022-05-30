@@ -318,14 +318,16 @@ def generate_percentile_metric(dataframe, fields_to_score, method="max", na_fill
         Computes percentage rank of data"""
     for field in fields_to_score:
         try:
-            new_score = "{0}_Score".format(field)
+            new_score = "{0}_PCT_SCR".format(field)
             if not invert:
                 dataframe[new_score] = dataframe[field].rank(method=method, pct=pct).fillna(value=na_fill)
             else:
                 dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=False).fillna(
                     value=na_fill)
         except:
+            arcpy.AddWarning("WARNING:Could not score column {0}. Check input dataframe.".format(field))
             logging.error("WARNING:Could not score column {0}. Check input dataframe.".format(field))
+
     return dataframe
 ###########################
 # ArcTime
