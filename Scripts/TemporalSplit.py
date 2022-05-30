@@ -110,11 +110,10 @@ def temporal_split(in_fc, out_ws, start_time, end_time, time_interval, compactBo
         else:
             san.arc_print("The desired workspace does not exist. Tool execution terminated.", True)
             arcpy.AddWarning("The desired workspace does not exist.")
-
     except arcpy.ExecuteError:
-        san.arc_print(arcpy.GetMessages(2))
+        arcpy.AddError(arcpy.GetMessages(2))
     except Exception as e:
-        san.arc_print(e.args[0])
+        arcpy.AddError(e.args[0])
 
 
 # Main Script

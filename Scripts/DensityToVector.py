@@ -115,10 +115,11 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         arcpy.DeleteField_management(input_network, [join_field, join_index])
         san.arc_print("Script Completed Successfully.", True)
 
+
     except arcpy.ExecuteError:
-        san.arc_print(arcpy.GetMessages(2))
+        arcpy.AddError(arcpy.GetMessages(2))
     except Exception as e:
-        san.arc_print(e.args[0])
+        arcpy.AddError(e.args[0])
 
 
 # End do_analysis function

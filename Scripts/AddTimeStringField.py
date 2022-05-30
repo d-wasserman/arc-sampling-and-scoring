@@ -65,11 +65,10 @@ def add_Time_String_Field(in_fc, input_field, new_field_name, time_format):
         san.arc_print("Delete temporary intermediates.")
         del fcDataFrame, finalStandardArray
         san.arc_print("Script Completed Successfully.", True)
-
     except arcpy.ExecuteError:
-        san.arc_print(arcpy.GetMessages(2))
+        arcpy.AddError(arcpy.GetMessages(2))
     except Exception as e:
-        san.arc_print(e.args[0])
+        arcpy.AddError(e.args[0])
 
         # End do_analysis function
 

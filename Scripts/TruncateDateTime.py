@@ -108,10 +108,11 @@ def truncate_date_time(in_fc, input_field, new_field_name, set_year=None, set_mo
         del fcDataFrame, finalStandardArray
         san.arc_print("Script Completed Successfully.", True)
 
+
     except arcpy.ExecuteError:
-        san.arc_print(arcpy.GetMessages(2))
+        arcpy.AddError(arcpy.GetMessages(2))
     except Exception as e:
-        san.arc_print(e.args[0])
+        arcpy.AddError(e.args[0])
 
         # End do_analysis function
 
