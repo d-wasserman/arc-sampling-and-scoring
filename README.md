@@ -117,6 +117,14 @@ are based on the values of each column, so they will change depending on the ext
 <td class="info" align="left">
 <span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the fields that percentiles scores added to the input feature class will be based. 
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span>Generally the fields are selected from the feature class to be converted into a numpy array, then into a pandas data frame, then back to structured numpy array to be joined based on the object ID. This tool assumes there is an object ID to use to join to from a table. These percentile scores are made of percent ranks using the pandas rank function. </span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+<tr>
+<td class="info">Other Parameters*</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This tool has a host of other parameters including parameters to invert scores (change from high to low to low to high, etc.), change the method of ranking (average vs. max), designated values to fill null scores, and the choice of relative ranking field groups. These parameters are documented in the tool metadata. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
 <span style="font-weight: bold">Python Reference</span><br><div style="text-align:Left;"><div><p><span>Generally the fields are selected from the feature class to be converted into a numpy array, then into a pandas data frame, then back to structured numpy array to be joined based on the object ID. This tool assumes there is an object ID to use to join to. </span></p></div></div></td>
 <td class="info" align="left">Multiple Value</td>
 </tr>
