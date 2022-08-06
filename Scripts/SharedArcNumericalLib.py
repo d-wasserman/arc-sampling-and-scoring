@@ -328,6 +328,7 @@ def generate_percentile_metric(dataframe, fields_to_score, ranking_group=None,
             dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
                 value=na_fill)
         else:
+            new_score = "{0}_GRP_PCT_SCR".format(field)
             grp = dataframe.groupby(ranking_group)
             dataframe[new_score] = grp[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
                 value=na_fill)
