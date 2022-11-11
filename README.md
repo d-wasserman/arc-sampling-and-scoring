@@ -8,6 +8,8 @@ This tool intended to provide a way to use sampling geography that will calculat
 # Usage
 The goal of this script is to enable analysis of demographic or other area based data based on arbitrary sampling polygons. 
 
+![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/master/Help/Assets/ProportionalAllocation@2x.png?raw=true)
+
 # Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
