@@ -70,7 +70,7 @@ The goal of this script is to enable analysis of demographic or other area based
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
 The goal of this script is to add new fields with standardized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
-![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/master/Help/Assets/Test.jpg?raw=true)
+![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/main/Help/Assets/Test.jpg?raw=true)
 
 # Parameters
 <table width="100%" border="0" cellpadding="5">
