@@ -95,7 +95,7 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
             raw_sample_df = san.arcgis_table_to_dataframe(temp_out_sample, [join_field, "RASTERVALU"])
             new_field_name = "DN_" + str(field_edit) + str(field)
             raw_sample_df[new_field_name] = raw_sample_df["RASTERVALU"]
-            raw_sample_df[new_field_name].replace([0], np.NaN, inplace=True)
+            raw_sample_df[new_field_name].fillna(0,inplace=True)
             raw_sample_df = raw_sample_df.groupby(join_field).agg(str(group_by_statistic).lower())
             if percentile_bool:
                 new_percentile_field = "Per_" + str(field_edit) + str(field)
