@@ -321,14 +321,17 @@ def generate_percentile_metric(dataframe, fields_to_score, ranking_group=None,
         Will make lower values be scored as higher values
     pct:  boolean, default True
         Computes percentage rank of data"""
+    field_suffix = "PCT"
+    if not pct:
+        field_suffix = "RNK"
     for field in fields_to_score:
-        new_score = "{0}_PCT_SCR".format(field)
+        new_score = "{0}_{1}_SCR".format(field, field_suffix)
         ascending_order = False if invert else True
         if ranking_group is None:
             dataframe[new_score] = dataframe[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
                 value=na_fill)
         else:
-            new_score = "{0}_GRP_PCT_SCR".format(field)
+            new_score = "{0}_GRP_{1}_SCR".format(field, field_suffix)
             grp = dataframe.groupby(ranking_group)
             dataframe[new_score] = grp[field].rank(method=method, pct=pct, ascending=ascending_order).fillna(
                 value=na_fill)

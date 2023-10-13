@@ -35,7 +35,7 @@ import SharedArcNumericalLib as san
 
 
 def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_score=False,
-                          percent_rank_method="average", null_fill_value=0):
+                          percent_rank_method="average", null_fill_value=0, number_rank=False):
     """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy.
     Parameters
@@ -59,7 +59,9 @@ def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_
         ‘first’: Ranks assigned in order they appear in the array.
     na_fill - float
         Will fill kept null values with the chosen value. Defaults to .5
-
+    number_rank - boolean
+        Will rank the values as numbers instead of percent ranks. This will be a number between 1 and the number of
+        values in the field.
     """
     try:
         arcpy.env.overwriteOutput = True
@@ -76,8 +78,9 @@ def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_
         df = san.arcgis_table_to_df(in_fc, input_fields)
         san.arc_print("Adding Percentile Rank Scores...")
         ranking_group_field = ranking_group_field if relative_ranking else None
+        pct_bool = not number_rank
         scored_df = san.generate_percentile_metric(df, scoring_fields, ranking_group_field, method=percent_rank_method,
-                                                   na_fill=null_fill_value, invert=invert_score)
+                                                    na_fill=null_fill_value, invert=invert_score,pct=pct_bool)
         scored_df = scored_df.drop(columns=input_fields)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         scored_df[JoinField] = scored_df.index
@@ -86,6 +89,7 @@ def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_
         san.arc_print(
             "Joining new percent rank fields to feature class. The new fields are {0}".format(str(scored_df.columns))
             , True)
+        san.arc_print("Sample of new fields: {0}".format(str(scored_df.head().to_string())))
         arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
         san.arc_print("Script Completed Successfully.", True)
     except arcpy.ExecuteError:
@@ -108,4 +112,5 @@ if __name__ == '__main__':
     InvertRank = bool(arcpy.GetParameter(3))
     RankMethod = arcpy.GetParameterAsText(4)
     NullValueFill = float(arcpy.GetParameterAsText(5))
-    add_percentile_fields(FeatureClass, InputFields, RankingGroupField, InvertRank, RankMethod, NullValueFill)
+    NumberRank = bool(arcpy.GetParameterAsText(6))
+    add_percentile_fields(FeatureClass, InputFields, RankingGroupField, InvertRank, RankMethod, NullValueFill,NumberRank)
