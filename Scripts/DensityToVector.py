@@ -92,7 +92,7 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
             output_kde = arcpy.sa.KernelDensity(in_fc, str(field), cell_size, search_radius, area_unit,
                                                 in_barriers = barrier_fc)
             arcpy.sa.ExtractValuesToPoints(temp_sample_points, output_kde, temp_out_sample, True)
-            raw_sample_df = san.arcgis_table_to_dataframe(temp_out_sample, [join_field, "RASTERVALU"])
+            raw_sample_df = san.arcgis_table_to_df(temp_out_sample, [join_field, "RASTERVALU"])
             new_field_name = "DN_" + str(field_edit) + str(field)
             raw_sample_df[new_field_name] = raw_sample_df["RASTERVALU"]
             raw_sample_df[new_field_name].fillna(0,inplace=True)
