@@ -72,7 +72,8 @@ def density_to_vector(in_fc, weighted_fields, input_network, percentile_bool=Tru
         # Start Analysis
         desc = arcpy.Describe(input_network)
         work_space = desc.catalogPath
-        arcpy.env.scratchWorkspace = "memory"
+        arcpy.env.scratchWorkspace = "memory" # Scratch in memory
+        arcpy.env.extent = input_network # Set extent to input network, rather than default point extent
         temp_out_sample = "memory/sample_points_out"
         temp_sample_points = "memory/sample_points"
         temp_input_layer = "Temp_Input_Layer"
