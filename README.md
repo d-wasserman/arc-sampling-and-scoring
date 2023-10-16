@@ -221,6 +221,65 @@ are based on the values of each column, so they will change depending on the ext
 </tbody>
 </table>
 
+# Min-Max Scaling Summary
+This tool is designed to perform min-max scaling on specified fields within an input feature class. By applying this scaling technique, fields are linearly normalized between a defined minimum and maximum value. Additionally, users have the option to set percentiles that can adjust what is considered the minimum or maximum, allowing for more flexible scaling based on percentile scores.
+
+# Usage
+The primary objective of this function is to facilitate the scaling of field values in a feature class, such that the values fall within a specified target range. This can be especially useful when comparing or visualizing datasets with different scales or units.
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input Feature Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the selected input feature class that will have new fields linearly normalized scores will be joined to it. If the fields already exist, they will be updated by the tool.</span></p></div></div></div></td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Input Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>List of fields to be scaled between either the min-max or some percentile band.</span></p></div></div></div></td>
+<td class="info" align="left">List</td>
+</tr>
+<tr>
+<td class="info">Minimum Percentile</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Minimum percentile for scaling. Replaces the minimum.</span></p></div></div></div></td>
+<td class="info" align="left">Float (optional)</td>
+</tr>
+<tr>
+<td class="info">Maximum Percentile</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Maximum percentile for scaling. Replaces the maximum.</span></p></div></div></div></td>
+<td class="info" align="left">Float (optional)</td>
+</tr>
+<tr>
+<td class="info">Target Minimum Score</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Minimum value of the target range for scaling.</span></p></div></div></div></td>
+<td class="info" align="left">Float</td>
+</tr>
+<tr>
+<td class="info">Target Maximum Score</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Maximum value of the target range for scaling.</span></p></div></div></div></td>
+<td class="info" align="left">Float</td>
+</tr>
+</tbody>
+</table>
+
 # Misc Tools
 
 # Create Class Field Summary
