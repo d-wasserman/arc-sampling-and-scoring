@@ -1,7 +1,9 @@
 # Distribution Summary
 A set of ArcGIS tools that assist with sampling and scoring spatial data by enabling proportional allocations, density sampling, and different scoring methods. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below.
 
-# arc-sample-and-score tbx
+## arc-sample-and-score tbx
+
+# Sampling Tools
 
 # Proportional Allocation Summary
 This tool intended to provide a way to use sampling geography that will calculate proportional averages or sums based on the percentage of an intersection covered by the sampling geography. The output is  the sampling geography with fields sampled from the base features.
@@ -66,6 +68,76 @@ The goal of this script is to enable analysis of demographic or other area based
 </tbody>
 </table>
 
+# Density To Vector Summary
+This script is intended to help aid a density based network/vector analysis process by computing KDEs, associating
+them with a target vector file, and computing percentile scores of non-zero/null density scores. This helps with
+cartography and analysis on networks and other vector data. 
+
+# Usage
+The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step. This tool leverages memory workspaces only usable in ArcGIS Pro, and it will no longer operate in ArcMap.  
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input_Feature_Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>Feature class of point values that will be used to compute kernel densities. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Feature Class</td>
+</tr>
+<tr>
+<td class="info">Weight_Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Density feature class fields that are used to both
+weight and filter kernel density estimates. Each kernel density is computed on non-null values, but a weight of 0 will still be treated as non-existent data. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Fields</td>
+</tr>
+<tr>
+<td class="info">Input_Target_Vector</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
+densities will be associated with. Zero values will be turned into nulls. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Feature Class</td>
+</tr>
+<tr>
+<td class="info">Add_Percentiles (Optional)</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, this will add a percentile calculation for every weight field. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Boolean</td>
+</tr>
+<tr>
+<td class="info">Cell_Size,Search_Radius, and Unit Area Factor</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the KDE control fields that the tool will use to compute the kernel densities of all the weighted elements in the input feature class. You can find out more information on the Kernel Density tools documentation. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Multiple Values</td>
+</tr>
+<tr>
+<td class="info">Barrier Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The dataset that defines the barriers for KDE estimation (impacts shortest distances). The barriers can be a feature layer of polyline or polygon features. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Multiple Values</td>
+</tr>
+</tbody>
+</table>
+
+# Scoring Tools
+ 
 # Standarize Fields Summary
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
@@ -149,7 +221,7 @@ are based on the values of each column, so they will change depending on the ext
 </tbody>
 </table>
 
-
+# Misc Tools
 
 # Create Class Field Summary
  This scripting tool is designed to take selected fields and create an added field that classifies based on their unique combinations of values using numpy.
@@ -197,71 +269,4 @@ are based on the values of each column, so they will change depending on the ext
  </div>
 
 
-# Density To Vector Summary
-This script is intended to help aid a density based network/vector analysis process by computing KDEs, associating
-them with a target vector file, and computing percentile scores of non-zero/null density scores. This helps with
-cartography and analysis on networks and other vector data. 
 
-# Usage
-The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step. This tool leverages memory workspaces only usable in ArcGIS Pro, and it will no longer operate in ArcMap.  
-
-# Parameters
-<table width="100%" border="0" cellpadding="5">
-<tbody>
-<tr>
-<th width="30%">
-<b>Parameter</b>
-</th>
-<th width="50%">
-<b>Explanation</b>
-</th>
-<th width="20%">
-<b>Data Type</b>
-</th>
-</tr>
-<tr>
-<td class="info">Input_Feature_Class</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>Feature class of point values that will be used to compute kernel densities. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Feature Class</td>
-</tr>
-<tr>
-<td class="info">Weight_Fields</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Density feature class fields that are used to both
-weight and filter kernel density estimates. Each kernel density is computed on non-null values, but a weight of 0 will still be treated as non-existent data. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Fields</td>
-</tr>
-<tr>
-<td class="info">Input_Target_Vector</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
-densities will be associated with. Zero values will be turned into nulls. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Feature Class</td>
-</tr>
-<tr>
-<td class="info">Add_Percentiles (Optional)</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, this will add a percentile calculation for every weight field. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Boolean</td>
-</tr>
-<tr>
-<td class="info">Cell_Size,Search_Radius, and Unit Area Factor</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the KDE control fields that the tool will use to compute the kernel densities of all the weighted elements in the input feature class. You can find out more information on the Kernel Density tools documentation. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Multiple Values</td>
-</tr>
-<tr>
-<td class="info">Barrier Features</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The dataset that defines the barriers for KDE estimation (impacts shortest distances). The barriers can be a feature layer of polyline or polygon features. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Multiple Values</td>
-</tr>
-</tbody>
-</table>
- 
