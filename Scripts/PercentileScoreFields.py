@@ -112,5 +112,5 @@ if __name__ == '__main__':
     InvertRank = bool(arcpy.GetParameter(3))
     RankMethod = arcpy.GetParameterAsText(4)
     NullValueFill = float(arcpy.GetParameterAsText(5))
-    NumberRank = bool(arcpy.GetParameterAsText(6))
+    NumberRank = bool(arcpy.GetParameter(6))
     add_percentile_fields(FeatureClass, InputFields, RankingGroupField, InvertRank, RankMethod, NullValueFill,NumberRank)
