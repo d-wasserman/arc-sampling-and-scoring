@@ -280,6 +280,68 @@ The primary objective of this function is to facilitate the scaling of field val
 </tbody>
 </table>
 
+# Compute Weighted Index Summary
+This tool is designed to calculate a weighted index for an input feature class using specified variable weights. The output is the original feature class with an additional field representing the computed weighted index.
+
+# Usage
+The goal of this script is to enable analysis of spatial data by applying weighted calculations to multiple attributes based on user-defined weights.
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%"><b>Parameter</b></th>
+<th width="50%"><b>Explanation</b></th>
+<th width="20%"><b>Data Type</b></th>
+</tr>
+<tr>
+<td class="info">Input Feature Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>The input feature class containing the attributes to be weighted and combined into a weighted index. The output will include a new field with the calculated index.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Input Variable Weight Value String</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>A string representing the value table of variables and their associated weights. Each entry should include the variable name and its weight.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Output Field Name</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>The name of the output field where the computed weighted index will be stored. This field will be added to the input feature class.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Null Fill Value</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>The value used to fill null entries in the input variables before computing the weighted index. This ensures no missing data affects the calculations.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">Float</td>
+</tr>
+</tbody>
+</table>
+
+
 # Misc Tools
 
 # Create Class Field Summary
