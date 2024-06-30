@@ -1,14 +1,16 @@
 # Distribution Summary
 A set of ArcGIS tools that assist with sampling and scoring spatial data by enabling proportional allocations, density sampling, and different scoring methods. The documentation for each tool in the scripts folder and toolbox will be placed in the read me in the section below.
 
-# arc-sample-and-score tbx
+## arc-sample-and-score tbx
+
+# Sampling Tools
 
 # Proportional Allocation Summary
 This tool intended to provide a way to use sampling geography that will calculate proportional averages or sums based on the percentage of an intersection covered by the sampling geography. The output is  the sampling geography with fields sampled from the base features.
 # Usage
 The goal of this script is to enable analysis of demographic or other area based data based on arbitrary sampling polygons. 
 
-![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/master/Help/Assets/ProportionalAllocation@2x.png?raw=true)
+![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/main/Help/Assets/ProportionalAllocation@2x.png?raw=true)
 
 # Parameters
 <table width="100%" border="0" cellpadding="5">
@@ -66,11 +68,81 @@ The goal of this script is to enable analysis of demographic or other area based
 </tbody>
 </table>
 
+# Density To Vector Summary
+This script is intended to help aid a density based network/vector analysis process by computing KDEs, associating
+them with a target vector file, and computing percentile scores of non-zero/null density scores. This helps with
+cartography and analysis on networks and other vector data. 
+
+# Usage
+The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step. This tool leverages memory workspaces only usable in ArcGIS Pro, and it will no longer operate in ArcMap.  
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input_Feature_Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>Feature class of point values that will be used to compute kernel densities. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Feature Class</td>
+</tr>
+<tr>
+<td class="info">Weight_Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Density feature class fields that are used to both
+weight and filter kernel density estimates. Each kernel density is computed on non-null values, but a weight of 0 will still be treated as non-existent data. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Fields</td>
+</tr>
+<tr>
+<td class="info">Input_Target_Vector</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
+densities will be associated with. Zero values will be turned into nulls. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Feature Class</td>
+</tr>
+<tr>
+<td class="info">Add_Percentiles (Optional)</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, this will add a percentile calculation for every weight field. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Boolean</td>
+</tr>
+<tr>
+<td class="info">Cell_Size,Search_Radius, and Unit Area Factor</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the KDE control fields that the tool will use to compute the kernel densities of all the weighted elements in the input feature class. You can find out more information on the Kernel Density tools documentation. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Multiple Values</td>
+</tr>
+<tr>
+<td class="info">Barrier Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The dataset that defines the barriers for KDE estimation (impacts shortest distances). The barriers can be a feature layer of polyline or polygon features. 
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Multiple Values</td>
+</tr>
+</tbody>
+</table>
+
+# Scoring Tools
+ 
 # Standarize Fields Summary
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields. 
 # Usage
 The goal of this script is to add new fields with standardized Z Scores for every field selected. The Z Scores are based on the values of each column, so they will change depending on the extent of the current data set.
-![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/master/Help/Assets/Test.jpg?raw=true)
+![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/main/Help/Assets/Test.jpg?raw=true)
 
 # Parameters
 <table width="100%" border="0" cellpadding="5">
@@ -149,7 +221,128 @@ are based on the values of each column, so they will change depending on the ext
 </tbody>
 </table>
 
+# Min-Max Scaling Summary
+This tool is designed to perform min-max scaling on specified fields within an input feature class. By applying this scaling technique, fields are linearly normalized between a defined minimum and maximum value. Additionally, users have the option to set percentiles that can adjust what is considered the minimum or maximum, allowing for more flexible scaling based on percentile scores.
 
+# Usage
+The primary objective of this function is to facilitate the scaling of field values in a feature class, such that the values fall within a specified target range. This can be especially useful when comparing or visualizing datasets with different scales or units.
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%">
+<b>Parameter</b>
+</th>
+<th width="50%">
+<b>Explanation</b>
+</th>
+<th width="20%">
+<b>Data Type</b>
+</th>
+</tr>
+<tr>
+<td class="info">Input Feature Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the selected input feature class that will have new fields linearly normalized scores will be joined to it. If the fields already exist, they will be updated by the tool.</span></p></div></div></div></td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Input Fields</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>List of fields to be scaled between either the min-max or some percentile band.</span></p></div></div></div></td>
+<td class="info" align="left">List</td>
+</tr>
+<tr>
+<td class="info">Minimum Percentile</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Minimum percentile for scaling. Replaces the minimum.</span></p></div></div></div></td>
+<td class="info" align="left">Float (optional)</td>
+</tr>
+<tr>
+<td class="info">Maximum Percentile</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Maximum percentile for scaling. Replaces the maximum.</span></p></div></div></div></td>
+<td class="info" align="left">Float (optional)</td>
+</tr>
+<tr>
+<td class="info">Target Minimum Score</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Minimum value of the target range for scaling.</span></p></div></div></div></td>
+<td class="info" align="left">Float</td>
+</tr>
+<tr>
+<td class="info">Target Maximum Score</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Maximum value of the target range for scaling.</span></p></div></div></div></td>
+<td class="info" align="left">Float</td>
+</tr>
+</tbody>
+</table>
+
+# Compute Weighted Index Summary
+This tool is designed to calculate a weighted index for an input feature class using specified variable weights. The output is the original feature class with an additional field representing the computed weighted index.
+
+# Usage
+The goal of this script is to enable analysis of spatial data by applying weighted calculations to multiple attributes based on user-defined weights.
+
+# Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%"><b>Parameter</b></th>
+<th width="50%"><b>Explanation</b></th>
+<th width="20%"><b>Data Type</b></th>
+</tr>
+<tr>
+<td class="info">Input Feature Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>The input feature class containing the attributes to be weighted and combined into a weighted index. The output will include a new field with the calculated index.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Input Variable Weight Value String</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>A string representing the value table of variables and their associated weights. Each entry should include the variable name and its weight.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Output Field Name</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>The name of the output field where the computed weighted index will be stored. This field will be added to the input feature class.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Null Fill Value</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br>
+<div style="text-align:Left;">
+<p>The value used to fill null entries in the input variables before computing the weighted index. This ensures no missing data affects the calculations.</p>
+</div>
+<div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+</td>
+<td class="info" align="left">Float</td>
+</tr>
+</tbody>
+</table>
+
+
+# Misc Tools
 
 # Create Class Field Summary
  This scripting tool is designed to take selected fields and create an added field that classifies based on their unique combinations of values using numpy.
@@ -197,71 +390,4 @@ are based on the values of each column, so they will change depending on the ext
  </div>
 
 
-# Density To Vector Summary
-This script is intended to help aid a density based network/vector analysis process by computing KDEs, associating
-them with a target vector file, and computing percentile scores of non-zero/null density scores. This helps with
-cartography and analysis on networks and other vector data. 
 
-# Usage
-The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step. This tool leverages memory workspaces only usable in ArcGIS Pro, and it will no longer operate in ArcMap.  
-
-# Parameters
-<table width="100%" border="0" cellpadding="5">
-<tbody>
-<tr>
-<th width="30%">
-<b>Parameter</b>
-</th>
-<th width="50%">
-<b>Explanation</b>
-</th>
-<th width="20%">
-<b>Data Type</b>
-</th>
-</tr>
-<tr>
-<td class="info">Input_Feature_Class</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><div><p><span>Feature class of point values that will be used to compute kernel densities. If the fields already exist, they will be updated by the tool. </span></p></div></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Feature Class</td>
-</tr>
-<tr>
-<td class="info">Weight_Fields</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Density feature class fields that are used to both
-weight and filter kernel density estimates. Each kernel density is computed on non-null values, but a weight of 0 will still be treated as non-existent data. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Fields</td>
-</tr>
-<tr>
-<td class="info">Input_Target_Vector</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>This is the target network/vector that the kernel
-densities will be associated with. Zero values will be turned into nulls. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Feature Class</td>
-</tr>
-<tr>
-<td class="info">Add_Percentiles (Optional)</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, this will add a percentile calculation for every weight field. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Boolean</td>
-</tr>
-<tr>
-<td class="info">Cell_Size,Search_Radius, and Unit Area Factor</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>These are the KDE control fields that the tool will use to compute the kernel densities of all the weighted elements in the input feature class. You can find out more information on the Kernel Density tools documentation. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Multiple Values</td>
-</tr>
-<tr>
-<td class="info">Barrier Features</td>
-<td class="info" align="left">
-<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The dataset that defines the barriers for KDE estimation (impacts shortest distances). The barriers can be a feature layer of polyline or polygon features. 
-</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
-<td class="info" align="left">Multiple Values</td>
-</tr>
-</tbody>
-</table>
- 

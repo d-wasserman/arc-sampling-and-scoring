@@ -28,8 +28,9 @@ import SharedArcNumericalLib as san
 
 # Function Definitions
 
+
 def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
-    """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
+    """This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
     join them back to the feature class using arcpy.
         Parameters
     -----------------
@@ -46,11 +47,17 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
         scored_df = None
         for column in input_Fields_List:
             try:
-                field_series = san.arcgis_table_to_dataframe(in_fc, [column], skip_nulls=ignore_nulls, null_values=0)
-                san.arc_print("Creating standarized column for field {0}.".format(str(column)), True)
+                field_series = san.arcgis_table_to_dataframe(
+                    in_fc, [column], skip_nulls=ignore_nulls, null_values=0
+                )
+                san.arc_print(
+                    "Creating standarized column for field {0}.".format(str(column)),
+                    True,
+                )
                 col_Standarized = arcpy.ValidateFieldName("Zscore_" + column, workspace)
-                field_series[col_Standarized] = (field_series[column] - field_series[column].mean()) / field_series[
-                    column].std(ddof=0)
+                field_series[col_Standarized] = (
+                    field_series[column] - field_series[column].mean()
+                ) / field_series[column].std(ddof=0)
                 finalColumnList.append(col_Standarized)
                 if col_Standarized != column:
                     del field_series[column]
@@ -58,7 +65,13 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
                     san.arc_print("Test")
                     scored_df = field_series
                 else:
-                    scored_df = pd.merge(scored_df, field_series, how="outer", left_index=True, right_index=True)
+                    scored_df = pd.merge(
+                        scored_df,
+                        field_series,
+                        how="outer",
+                        left_index=True,
+                        right_index=True,
+                    )
             except Exception as e:
                 san.arc_print("Could not process field {0}".format(str(column)))
                 san.arc_print(e.args[0])
@@ -66,14 +79,20 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         scored_df[JoinField] = scored_df.index
         finalColumnList.append(JoinField)
-        san.arc_print("Exporting new standarized dataframe to structured numpy array.", True)
+        san.arc_print(
+            "Exporting new standarized dataframe to structured numpy array.", True
+        )
         finalStandardArray = scored_df.to_records()
         san.arc_print(
-            "Joining new standarized fields to feature class. The new fields are {0}".format(str(finalColumnList))
-            , True)
-        arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
+            "Joining new standarized fields to feature class. The new fields are {0}".format(
+                str(finalColumnList)
+            ),
+            True,
+        )
+        arcpy.da.ExtendTable(
+            in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False
+        )
         san.arc_print("Script Completed Successfully.", True)
-
 
     except arcpy.ExecuteError:
         arcpy.AddError(arcpy.GetMessages(2))
@@ -87,7 +106,7 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
 # system command prompt (stand-alone), in a Python IDE,
 # as a geoprocessing script tool, or as a module imported in
 # another script
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Define Inputs
     FeatureClass = arcpy.GetParameterAsText(0)
     InputFields = arcpy.GetParameterAsText(1).split(";")

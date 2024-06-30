@@ -107,8 +107,8 @@ if __name__ == '__main__':
     search_radius = arcpy.GetParameter(7)
     # Simplify processing by associating input lists to target merge rules
     merge_rule_dict = {}
-    merge_rule_identifiers = ["SUM", "MEAN", "MEDIAN", "MODE", "STD", "MIN", "MAX", "RANGE", "COUNT", "FIRST"]
-    for merge_rule, index in zip(merge_rule_identifiers, range(8, 18)):
+    merge_rule_identifiers = ["SUM", "MEAN", "MEDIAN", "MODE", "STD", "MIN", "MAX", "RANGE", "COUNT", "FIRST", "LAST"]
+    for merge_rule, index in zip(merge_rule_identifiers, range(8, 19)):
         merge_rule_dict[merge_rule] = [field for field in arcpy.GetParameterAsText(index).split(";") if
                                        san.field_exist(join_feature_class, field)]
     statistical_spatial_join(target_feature_class, join_feature_class, output_feature_Class, prepended_field_name,
