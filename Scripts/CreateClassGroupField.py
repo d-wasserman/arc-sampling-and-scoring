@@ -27,11 +27,17 @@ import itertools
 
 
 # Function Definitions
-def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND", equalityOperator="=",
-                             noneEqualityOperator="is"):
+def constructChainedSQLQuery(
+    fieldNames,
+    values,
+    dataSource,
+    chainOperator="AND",
+    equalityOperator="=",
+    noneEqualityOperator="is",
+):
     """Creates a workspace sensitive equality query that is chained with some intermediary operator. The function
-     will strip the last operator added. The passed fieldNames and values are both assumed to be ordered.
-     David Wasserman"""
+    will strip the last operator added. The passed fieldNames and values are both assumed to be ordered.
+    David Wasserman"""
     fieldNamesLength, valuesLength = len(fieldNames), len(values)
     index_range = range(min(fieldNamesLength, valuesLength))
     final_chained_query = ""
@@ -41,29 +47,38 @@ def constructChainedSQLQuery(fieldNames, values, dataSource, chainOperator="AND"
         arcpy.AddMessage(error_pot_string)
         arcpy.AddWarning(error_pot_string)
     for idx in index_range:
-        base_query = san.constructSQLEqualityQuery(fieldNames[idx], values[idx], dataSource, equalityOperator,
-                                                   noneEqualityOperator)
+        base_query = san.constructSQLEqualityQuery(
+            fieldNames[idx],
+            values[idx],
+            dataSource,
+            equalityOperator,
+            noneEqualityOperator,
+        )
         if idx == 0:
             final_chained_query = "{0} {1}".format(base_query, final_chained_query)
         else:
-            final_chained_query = "{0} {1} {2}".format(base_query, chainOperator.strip(), final_chained_query)
+            final_chained_query = "{0} {1} {2}".format(
+                base_query, chainOperator.strip(), final_chained_query
+            )
     return final_chained_query
 
 
 @san.arc_tool_report
 def constructUniqueStringID(values, delimiter="."):
     """Creates a unique string id based on delimited passed values. The function will strip the last/first
-     delimiters added.-David Wasserman"""
+    delimiters added.-David Wasserman"""
     final_chained_id = ""
     for value in values:
-        final_chained_id = "{0}{1}{2}".format(final_chained_id, str(delimiter), str(value))
+        final_chained_id = "{0}{1}{2}".format(
+            final_chained_id, str(delimiter), str(value)
+        )
         final_chained_id = final_chained_id
     final_chained_id = final_chained_id.strip("{0}".format(delimiter))
     return final_chained_id
 
 
 def create_class_group_field(in_fc, input_fields, basename="GROUP_"):
-    """ This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
+    """This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
     join them back to the feature class using arcpy.
         Parameters
     -----------------
@@ -74,10 +89,12 @@ def create_class_group_field(in_fc, input_fields, basename="GROUP_"):
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
         workspace = os.path.dirname(desc.catalogPath)
-        input_Fields_List = input_fields.split(';')
+        input_Fields_List = input_fields.split(";")
         san.arc_print("Adding Class Fields.", True)
         valid_num_field = arcpy.ValidateFieldName("{0}_Num".format(basename), workspace)
-        valid_text_field = arcpy.ValidateFieldName("{0}_Text".format(basename), workspace)
+        valid_text_field = arcpy.ValidateFieldName(
+            "{0}_Text".format(basename), workspace
+        )
         san.add_new_field(in_fc, valid_num_field, "LONG")
         san.add_new_field(in_fc, valid_text_field, "TEXT")
         san.arc_print("Constructing class groups within dictionary.", True)
@@ -98,11 +115,12 @@ def create_class_group_field(in_fc, input_fields, basename="GROUP_"):
                     cursor.updateRow(row)
                     counter += 1
                 except Exception as e:
-                    san.arc_print("ERROR: Skipped at iteration {0}. QAQC.".format(counter), True)
+                    san.arc_print(
+                        "ERROR: Skipped at iteration {0}. QAQC.".format(counter), True
+                    )
                     san.arc_print(str(e.args[0]))
         del unique_class_dict
         san.arc_print("Script Completed Successfully.", True)
-
 
     except arcpy.ExecuteError:
         arcpy.AddError(arcpy.GetMessages(2))
@@ -115,7 +133,7 @@ def create_class_group_field(in_fc, input_fields, basename="GROUP_"):
 # system command prompt (stand-alone), in a Python IDE,
 # as a geoprocessing script tool, or as a module imported in
 # another script
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Define Inputs
     FeatureClass = arcpy.GetParameterAsText(0)  # r"C:"
     InputFields = arcpy.GetParameterAsText(1)  # "CBSA_POP;D5cri"

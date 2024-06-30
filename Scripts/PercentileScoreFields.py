@@ -34,9 +34,16 @@ import SharedArcNumericalLib as san
 # Function Definitions
 
 
-def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_score=False,
-                          percent_rank_method="average", null_fill_value=0, number_rank=False):
-    """ This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
+def add_percentile_fields(
+    in_fc,
+    input_fields,
+    ranking_group_field=None,
+    invert_score=False,
+    percent_rank_method="average",
+    null_fill_value=0,
+    number_rank=False,
+):
+    """This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy.
     Parameters
     -----------------
@@ -79,18 +86,34 @@ def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_
         san.arc_print("Adding Percentile Rank Scores...")
         ranking_group_field = ranking_group_field if relative_ranking else None
         pct_bool = not number_rank
-        scored_df = san.generate_percentile_metric(df, scoring_fields, ranking_group_field, method=percent_rank_method,
-                                                    na_fill=null_fill_value, invert=invert_score,pct=pct_bool)
+        scored_df = san.generate_percentile_metric(
+            df,
+            scoring_fields,
+            ranking_group_field,
+            method=percent_rank_method,
+            na_fill=null_fill_value,
+            invert=invert_score,
+            pct=pct_bool,
+        )
         scored_df = scored_df.drop(columns=input_fields)
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
         scored_df[JoinField] = scored_df.index
-        san.arc_print("Exporting new percentile dataframe to structured numpy array.", True)
+        san.arc_print(
+            "Exporting new percentile dataframe to structured numpy array.", True
+        )
         finalStandardArray = scored_df.to_records()
         san.arc_print(
-            "Joining new percent rank fields to feature class. The new fields are {0}".format(str(scored_df.columns))
-            , True)
-        san.arc_print("Sample of new fields: {0}".format(str(scored_df.head().to_string())))
-        arcpy.da.ExtendTable(in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False)
+            "Joining new percent rank fields to feature class. The new fields are {0}".format(
+                str(scored_df.columns)
+            ),
+            True,
+        )
+        san.arc_print(
+            "Sample of new fields: {0}".format(str(scored_df.head().to_string()))
+        )
+        arcpy.da.ExtendTable(
+            in_fc, OIDFieldName, finalStandardArray, JoinField, append_only=False
+        )
         san.arc_print("Script Completed Successfully.", True)
     except arcpy.ExecuteError:
         arcpy.AddError(arcpy.GetMessages(2))
@@ -104,7 +127,7 @@ def add_percentile_fields(in_fc, input_fields, ranking_group_field=None, invert_
 # system command prompt (stand-alone), in a Python IDE,
 # as a geoprocessing script tool, or as a module imported in
 # another script
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Define Inputs
     FeatureClass = arcpy.GetParameterAsText(0)
     InputFields = arcpy.GetParameterAsText(1).split(";")
@@ -113,4 +136,12 @@ if __name__ == '__main__':
     RankMethod = arcpy.GetParameterAsText(4)
     NullValueFill = float(arcpy.GetParameterAsText(5))
     NumberRank = bool(arcpy.GetParameter(6))
-    add_percentile_fields(FeatureClass, InputFields, RankingGroupField, InvertRank, RankMethod, NullValueFill,NumberRank)
+    add_percentile_fields(
+        FeatureClass,
+        InputFields,
+        RankingGroupField,
+        InvertRank,
+        RankMethod,
+        NullValueFill,
+        NumberRank,
+    )
