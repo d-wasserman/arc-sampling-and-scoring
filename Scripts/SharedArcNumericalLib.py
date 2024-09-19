@@ -747,6 +747,56 @@ def join_record_dictionary(
                     except:
                         pass
             join_cursor.updateRow(row)
+def update_feature_class(feature_class, unique_id_field, df, columns_to_update, dataframe_unique_id_field=None):
+    """
+    Update an ArcGIS feature class using arcpy.da.UpdateCursor based on unique IDs that may differ in name between the feature class and the dataframe.
+    
+    :param feature_class: The path to the feature class to update.
+    :param unique_id_field: The name of the unique ID field in the feature class.
+    :param df: The pandas dataframe containing the updates, including the unique ID field and columns to update.
+    :param columns_to_update: The list of columns to update. These should be present in both the dataframe and feature class.
+    :param dataframe_unique_id_field: (Optional) The name of the unique ID field in the dataframe. If None, uses unique_id_field.
+    """
+    import arcpy
+    import pandas as pd
+
+    # If dataframe_unique_id_field is None, default to unique_id_field
+    if dataframe_unique_id_field is None:
+        dataframe_unique_id_field = unique_id_field
+
+    # Ensure the unique ID field is in the dataframe
+    if dataframe_unique_id_field not in df.columns:
+        raise ValueError(f"The unique ID field '{dataframe_unique_id_field}' is not in the dataframe columns.")
+
+    # Ensure that columns_to_update are in the dataframe
+    missing_columns = [col for col in columns_to_update if col not in df.columns]
+    if missing_columns:
+        raise ValueError(f"The following columns are missing in the dataframe: {missing_columns}")
+
+    # Set the dataframe index to the dataframe unique ID without modifying the original dataframe
+    df_indexed = df.set_index(dataframe_unique_id_field, inplace=False)
+
+    arc_print("Create a dictionary mapping unique IDs to the columns to update...")
+    update_dict = df_indexed[columns_to_update].to_dict('index')
+    # update_dict = {dataframe_unique_id: {col1: val1, col2: val2, ...}, ...}
+
+    # Fields to include in the cursor
+    cursor_fields = [unique_id_field] + columns_to_update
+
+    # Open an update cursor
+    arc_print("Updating features with update cursor and unpacking dataframe dictionary...")
+    with arcpy.da.UpdateCursor(feature_class, cursor_fields) as cursor:
+        for row in cursor:
+            feature_unique_id = row[0]  # unique ID field is the first field in cursor_fields
+
+            # Assume the unique IDs have matching values
+            if feature_unique_id in update_dict:
+                # Update the row with the values from the dataframe
+                for idx, field in enumerate(columns_to_update, start=1):
+                    row[idx] = update_dict[feature_unique_id][field]
+                cursor.updateRow(row)
+            else:
+                arcpy.AddError("No matching unique ID in dictionary...")
 
 
 # End do_analysis function
