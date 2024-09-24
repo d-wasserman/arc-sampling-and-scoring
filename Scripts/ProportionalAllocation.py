@@ -4,7 +4,7 @@
 # averages or sums based on the percentage of an intersection covered by the sampling geography. The output is
 # the sampling geography with fields sampled from the base features.
 # Current Owner: David Wasserman
-# Last Modified: 1/25/2022
+# Last Modified: 9/23/2024
 # Copyright:   David Wasserman
 # ArcGIS Version:   ArcGIS Pro
 # Python Version:   3.8
@@ -82,6 +82,8 @@ def proportional_allocation(
     sum_fields = [i for i in sum_fields if san.field_exist(temp_intersect, i)]
     mean_fields = [i for i in mean_fields if san.field_exist(temp_intersect, i)]
     agg_fields = list(set(sum_fields + mean_fields))
+    if len(agg_fields) == 0:
+        arcpy.AddError("No valid fields to aggregate. Exiting script.")
     all_fields = [sampling_id, inter_area_col, base_area_col] + agg_fields
     inter_df = san.arcgis_table_to_df(temp_intersect, all_fields)
     inter_df[ratio_coverage] = inter_df[inter_area_col].fillna(0) / inter_df[
