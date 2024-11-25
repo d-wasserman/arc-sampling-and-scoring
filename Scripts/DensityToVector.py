@@ -157,7 +157,7 @@ def density_to_vector(
         arcpy.da.ExtendTable(
             input_network, join_field, fin_records, join_index, append_only=False
         )
-        san.arc_print("Deleteing temporary join field...")
+        san.arc_print("Deleting temporary join field...")
         arcpy.DeleteField_management(input_network, [join_field, join_index])
         san.arc_print("Script Completed Successfully.", True)
 
