@@ -133,6 +133,13 @@ densities will be associated with. Zero values will be turned into nulls.
 </span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
 <td class="info" align="left">Multiple Values</td>
 </tr>
+<tr>
+<td class="info">Intermediate Raster</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The output save location for intermediate raster files from the kernel density.
+</span></p></div></div><div class="noContent" style="text-align:center; margin-top: -1em">___________________</div><br>
+<td class="info" align="left">Raster Dataset</td>
+</tr>
 </tbody>
 </table>
 

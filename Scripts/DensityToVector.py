@@ -59,6 +59,7 @@ def density_to_vector(
     sample_percentage=25,
     group_by_statistic="median",
     barrier_fc="",
+    intermediate_raster="",
 ):
     """This function will compute kernel densities and associate them with a target network/vector file. If the
     percentile bool is true, percentile scores are added along side each density.
@@ -78,6 +79,7 @@ def density_to_vector(
             on options accepted by agg function in pandas:
             https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.agg.html.
     barrier_fc: a feature class (line or polygon) that defines a barrier for KDE estimation.
+    intermediate_raster: The output save location for intermediate raster files from the kernel density.
     """
     try:
         arcpy.env.overwriteOutput = True
@@ -118,6 +120,9 @@ def density_to_vector(
                 area_unit,
                 in_barriers=barrier_fc,
             )
+            if intermediate_raster:
+                san.arc_print("Generating an intermediate raster...")
+                output_kde.save(intermediate_raster)
             arcpy.sa.ExtractValuesToPoints(
                 temp_sample_points, output_kde, temp_out_sample, True
             )
@@ -181,6 +186,7 @@ if __name__ == "__main__":
     percentage_sample = arcpy.GetParameter(8)
     group_by_stat = arcpy.GetParameter(9)
     barrier_fc = arcpy.GetParameterAsText(10)
+    intermediate_ra = arcpy.GetParameterAsText(11)
     density_to_vector(
         input_feature_class,
         weighted_fields,
@@ -193,4 +199,5 @@ if __name__ == "__main__":
         percentage_sample,
         group_by_stat,
         barrier_fc,
+        intermediate_ra,
     )
