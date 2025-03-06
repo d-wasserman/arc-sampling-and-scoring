@@ -1,7 +1,7 @@
 # Name: ComputeWeightedIndex.py
 # Purpose: This function will return a weighted index based on the input feature class and the input variable weight value table.
 # Author: David Wasserman
-# Last Modified: 6/29/2024
+# Last Modified: 3/6/2025
 # Copyright: David Wasserman
 # Python Version:   3.9
 # ArcGIS Version: 3.2 Pro
@@ -75,9 +75,9 @@ def compute_weighted_index(
         for key in weight_dict:
             weight = weight_dict[key]
             if output_field_name in df.columns:
-                df[output_field_name] = df[var] * weight + df[output_field_name]
+                df[output_field_name] = df[var].astype(float) * float(weight) + df[output_field_name]
             else:
-                df[output_field_name] = df[var] * weight
+                df[output_field_name] = df[var].astype(float) * float(weight)
 
         # Prepare for export
         JoinField = arcpy.ValidateFieldName("DFIndexJoin", workspace)
