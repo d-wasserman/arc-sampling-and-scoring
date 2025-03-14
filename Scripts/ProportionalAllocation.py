@@ -55,7 +55,7 @@ def proportional_allocation(
     """
     arcpy.env.overwriteOutput = True
     # Start Analysis
-    temp_intersect = os.path.join("in_memory", "temp_intersect")
+    temp_intersect = os.path.join("memory", "temp_intersect")
     san.arc_print("Calculating original areas...")
     base_area_col = "base_area_sqmi"
     inter_area_col = "inter_area_sqmi"
