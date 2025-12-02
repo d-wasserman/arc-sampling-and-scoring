@@ -137,8 +137,11 @@ def arc_print(string, progressor_Bool=False):
 
 @arc_tool_report
 def field_exist(featureclass, fieldname):
-    """ArcFunction
-    Check if a field in a feature class field exists and return true it does, false if not.- David Wasserman
+    """Check if a field in a feature class field exists and return true it does, false if not.
+    Parameters
+    --------------
+    featureclass - feature class - input whose fields are checked. 
+    fieldname - string - input used to check if a field exists in a feature class. 
     """
     fieldList = arcpy.ListFields(featureclass, fieldname)
     fieldCount = len(fieldList)
@@ -163,8 +166,10 @@ def add_new_field(
     field_is_required="#",
     field_domain="#",
 ):
-    """ArcFunction
-    Add a new field if it currently does not exist. Add field alone is slower than checking first.- David Wasserman
+    """Add a new field if it currently does not exist. Add field alone is slower than checking first.- David Wasserman
+    Parameters
+    -----------
+    Same as Add Field: https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/add-field.htm
     """
     if field_exist(in_table, field_name):
         print(field_name + " Exists")
