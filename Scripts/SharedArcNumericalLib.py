@@ -137,7 +137,7 @@ def arc_print(string, progressor_Bool=False):
 
 @arc_tool_report
 def field_exist(featureclass, fieldname):
-    """Check if a field in a feature class field exists and return true it does, false if not.
+    """Check if a field in a feature class exists and return true it does, false if not.
     Parameters
     --------------
     featureclass - feature class - input whose fields are checked. 
@@ -263,7 +263,7 @@ def arc_unique_values(table, field, filter_falsy=False):
 
 @arc_tool_report
 def arc_unique_value_lists(in_feature_class, field_list, filter_falsy=False):
-    """Function will returned a nested list of unique values for each field in the same order as the field list."""
+    """Function will return a nested list of unique values for each field in the same order as the field list."""
     ordered_list = []
     len_list = []
     for field in field_list:
@@ -368,9 +368,9 @@ def generate_statistical_fieldmap(
 
 @arc_tool_report
 def generate_sample_points(in_fc, out_fc, sample_percentage=10):
-    """This will take in a feature class and return a feature class of points. Polygons and points have feature to point
-    used, and line files have sample points created along the line in lengths an equal distance apart as close to the
-    distance set in this function in the units of the current projection."""
+    """This will take in a feature class and return a feature class of points. For polygons and points,
+    FeatureToPoint is used. For polylines, points are generated at equal intervals along the line based on
+    the given sample percentage, in the units of the current projection."""
     describe_obj = arcpy.Describe(in_fc)
     shape_type = str(describe_obj.shapeType)
     if shape_type == "Polyline":
