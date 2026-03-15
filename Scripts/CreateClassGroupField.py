@@ -78,12 +78,12 @@ def constructUniqueStringID(values, delimiter="."):
 
 
 def create_class_group_field(in_fc, input_fields, basename="GROUP_"):
-    """This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
-    join them back to the feature class using arcpy.
+    """This function will take in a feature class and create a numeric group ID field and a string field
+    representing the unique combination of values for each row, joining them back to the feature class using arcpy.
         Parameters
     -----------------
-    in_fc- input feature class to add percentile fields
-    input_fields - input fields to build a unique id from
+    in_fc- input feature class to add class group fields
+    input_fields - input fields to build a unique group id from
     basename- base name for group fields."""
     try:
         arcpy.env.overwriteOutput = True
