@@ -71,9 +71,9 @@ def density_to_vector(
     percentile_bool: if true, adds percentiles to scores
     field_edit: prepended field name
     cell_size: cell size of KDE raster
-    search_radius: search radius/bandwith of KDE
+    search_radius: search radius/bandwidth of KDE
     area_unit: unit of output raster
-    sample_percentage: determine sample points to use in polyline files. 10 will given 1 point every 10% of the line.
+    sample_percentage: determines the sample point density for polyline files. 10 will give 1 point every 10% of the line.
        Includes stop and end points.
     group_by_statistic: if multiple sample points are used, this is the statistic used to aggregate it, based
             on options accepted by agg function in pandas:
