@@ -43,7 +43,7 @@ def add_percentile_fields(
     null_fill_value=0,
     number_rank=False,
 ):
-    """This function will take in an feature class, and use pandas/numpy to calculate percentile scores and then
+    """This function will take in a feature class, and use pandas/numpy to calculate percentile scores and then
     join them back to the feature class using arcpy.
     Parameters
     -----------------
@@ -53,7 +53,7 @@ def add_percentile_fields(
         they are ranked relative to the values in each group.
     invert_score - boolean
         Will make lower values be scored as higher values
-    percentile_method - {‘average’, ‘min’, ‘max’, ‘dense’, ‘ordinal’}, optional
+    percent_rank_method - {‘average’, ‘min’, ‘max’, ‘dense’, ‘ordinal’}, optional
         The method used to assign percentile ranks to tied elements.
         The following methods are available (default is ‘average’):
         ‘average’: The average of the ranks that would have been assigned to all the tied values is assigned to each
@@ -65,7 +65,7 @@ def add_percentile_fields(
         assigned to the tied elements.
         ‘first’: Ranks assigned in order they appear in the array.
     na_fill - float
-        Will fill kept null values with the chosen value. Defaults to .5
+        Will fill null values with the chosen value. Defaults to 0.5
     number_rank - boolean
         Will rank the values as numbers instead of percent ranks. This will be a number between 1 and the number of
         values in the field.
