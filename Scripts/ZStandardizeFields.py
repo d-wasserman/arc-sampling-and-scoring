@@ -1,5 +1,5 @@
 # Name: ZStandardizeFields.py
-# Purpose: Will add selected fields as standarized Z scores by extending a numpy array to the feature class.
+# Purpose: Will add selected fields as standardized Z scores by extending a numpy array to the feature class.
 # Author: David Wasserman
 # Last Modified: 4/16/2021
 # Copyright: David Wasserman
@@ -30,13 +30,13 @@ import SharedArcNumericalLib as san
 
 
 def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
-    """This function will take in an feature class, and use pandas/numpy to calculate Z-scores and then
+    """This function will take in a feature class, and use pandas/numpy to calculate Z-scores and then
     join them back to the feature class using arcpy.
         Parameters
     -----------------
-    in_fc- input feature class to add percentile fields
-    input_fields - table fields to add Z Scores too
-    ignore_nulls - ignore null values in percentile calculations"""
+    in_fc- input feature class to add Z-score fields
+    input_fields - table fields to add Z scores to
+    ignore_nulls - ignore null values in Z-score calculations"""
     try:
         arcpy.env.overwriteOutput = True
         desc = arcpy.Describe(in_fc)
@@ -51,7 +51,7 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
                     in_fc, [column], skip_nulls=ignore_nulls, null_values=0
                 )
                 san.arc_print(
-                    "Creating standarized column for field {0}.".format(str(column)),
+                    "Creating standardized column for field {0}.".format(str(column)),
                     True,
                 )
                 col_Standarized = arcpy.ValidateFieldName("Zscore_" + column, workspace)
@@ -80,11 +80,11 @@ def add_standarized_fields(in_fc, input_Fields, ignore_nulls=True):
         scored_df[JoinField] = scored_df.index
         finalColumnList.append(JoinField)
         san.arc_print(
-            "Exporting new standarized dataframe to structured numpy array.", True
+            "Exporting new standardized dataframe to structured numpy array.", True
         )
         finalStandardArray = scored_df.to_records()
         san.arc_print(
-            "Joining new standarized fields to feature class. The new fields are {0}".format(
+            "Joining new standardized fields to feature class. The new fields are {0}".format(
                 str(finalColumnList)
             ),
             True,
