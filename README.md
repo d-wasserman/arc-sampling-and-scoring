@@ -1,18 +1,16 @@
 # Arc Sampling and Scoring
-A set of ArcGIS tools that assist with sampling and scoring spatial data by enabling proportional allocations, density sampling, and different scoring methods. The documentation for each tool in the scripts folder and toolbox are documented in this README.
-
-## arc-sample-and-score tbx
+A set of ArcGIS Pro tools that assist with sampling and scoring spatial data by enabling proportional allocations, density sampling, and different scoring methods. The documentation for each tool in the scripts folder and toolbox are documented in this README.
 
 ## Sampling Tools
 
 ### Proportional Allocation Summary
 This tool is intended to provide a way to use sampling geography that will calculate proportional averages or sums based on the percentage of an intersection covered by the sampling geography. The output is the sampling geography with fields sampled from the base features.
-### Usage
+#### Usage
 The goal of this script is to enable analysis of demographic or other area-based data using arbitrary sampling polygons.
 
-![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/main/Help/Assets/ProportionalAllocation@2x.png?raw=true)
+![Proportional Allocation](https://github.com/d-wasserman/arc-sampling-and-scoring/blob/main/Help/Assets/ProportionalAllocation@2x.png?raw=true)
 
-### Parameters
+#### Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
@@ -73,10 +71,10 @@ This script is intended to help aid a density based network/vector analysis proc
 them with a target vector file, and computing percentile scores of non-zero/null density scores. This helps with
 cartography and analysis on networks and other vector data.
 
-### Usage
+#### Usage
 The goal of this script is to assist in creating clean density maps using networks and to assist with planning prioritization processes by scoring those chosen densities according to multiple weights in a single step. This tool leverages memory workspaces only usable in ArcGIS Pro, and it will no longer operate in ArcMap.
 
-### Parameters
+#### Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
@@ -147,11 +145,11 @@ densities will be associated with. Zero values will be turned into nulls.
 
 ### Standardize Fields Summary
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a Z score for each one of the selected fields.
-### Usage
+#### Usage
 The goal of this script is to add new fields with standardized Z scores for every field selected. The Z scores are based on the values of each column, so they will change depending on the extent of the current data set.
-![alt tag](https://github.com/Holisticnature/ArcNumerical-Tools/blob/main/Help/Assets/Test.jpg?raw=true)
+![Standardize Fields](https://github.com/d-wasserman/arc-sampling-and-scoring/blob/main/Help/Assets/Test.jpg?raw=true)
 
-### Parameters
+#### Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
@@ -184,11 +182,11 @@ The goal of this script is to add new fields with standardized Z scores for ever
 
 ### Percentile Fields Summary
 This ArcGIS scripting tool is designed to take selected fields and create an added field with a percentile score for each one of the selected fields.
-### Usage
+#### Usage
 The goal of this script is to add new fields with percentile scores for every field selected. The percentile scores
 are based on the values of each column, so they will change depending on the extent of the current data set.
 
-### Parameters
+#### Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
@@ -231,10 +229,10 @@ are based on the values of each column, so they will change depending on the ext
 ### Min-Max Scaling Summary
 This tool is designed to perform min-max scaling on specified fields within an input feature class. By applying this scaling technique, fields are linearly normalized between a defined minimum and maximum value. Additionally, users have the option to set percentiles that can adjust what is considered the minimum or maximum, allowing for more flexible scaling based on percentile scores.
 
-### Usage
+#### Usage
 The primary objective of this function is to facilitate the scaling of field values in a feature class, such that the values fall within a specified target range. This can be especially useful when comparing or visualizing datasets with different scales or units.
 
-### Parameters
+#### Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
@@ -290,10 +288,10 @@ The primary objective of this function is to facilitate the scaling of field val
 ### Compute Weighted Index Summary
 This tool is designed to calculate a weighted index for an input feature class using specified variable weights. The output is the original feature class with an additional field representing the computed weighted index.
 
-### Usage
+#### Usage
 The goal of this script is to enable analysis of spatial data by applying weighted calculations to multiple attributes based on user-defined weights.
 
-### Parameters
+#### Parameters
 <table width="100%" border="0" cellpadding="5">
 <tbody>
 <tr>
@@ -353,10 +351,10 @@ The goal of this script is to enable analysis of spatial data by applying weight
 
 ### Create Class Group Field Summary
 This scripting tool is designed to take selected fields and create a classification field based on unique combinations of field values using numpy.
-### Usage
+#### Usage
 The goal of this script is to add a group field based on a selection of fields chosen in the tool. Two fields will be added, one with a number representing the group ID (can be dissolved or summarized on), and another with a string with the query used to isolate it. The names of the fields are based on the base name parameter.
 
-### Parameters
+#### Parameters
 
  <table width="100%" border="0" cellpadding="5">
  <tbody>
@@ -394,3 +392,92 @@ The goal of this script is to add a group field based on a selection of fields c
  </tr>
  </tbody>
  </table>
+
+### Numerical Spatial Join Summary
+This tool provides an alternative method for spatial joins where target feature class attributes are preserved and join feature attributes are aggregated using user-defined summary statistics (SUM, MEAN, MEDIAN, MODE, STD, MIN, MAX, RANGE, COUNT, FIRST, LAST). A field name prefix can be specified to distinguish joined fields.
+
+#### Usage
+The goal of this tool is to give more control over spatial join merge rules by allowing users to assign specific summary statistics to individual fields from the join feature class. This is useful when the default spatial join behavior does not provide the desired aggregation.
+
+#### Parameters
+<table width="100%" border="0" cellpadding="5">
+<tbody>
+<tr>
+<th width="30%"><b>Parameter</b></th>
+<th width="50%"><b>Explanation</b></th>
+<th width="20%"><b>Data Type</b></th>
+</tr>
+<tr>
+<td class="info">Target_Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The target features whose attributes will be preserved in the output. The geometry of the output matches the target features.</span></p></div></div></td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Join_Features</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The join features whose attributes will be aggregated and joined to the target features based on spatial relationship.</span></p></div></div></td>
+<td class="info" align="left">Feature Layer</td>
+</tr>
+<tr>
+<td class="info">Output_Feature_Class</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The output feature class containing target attributes and aggregated join attributes.</span></p></div></div></td>
+<td class="info" align="left">Feature Class</td>
+</tr>
+<tr>
+<td class="info">Prepended_Field_Name</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>A string prepended to all joined field names to distinguish them from original fields.</span></p></div></div></td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Join_Operation</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>JOIN_ONE_TO_ONE aggregates multiple matches into one record per target feature. JOIN_ONE_TO_MANY creates a record for each match.</span></p></div></div></td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Keep_All</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>If true, all target features are kept (outer join). If false, only target features with a spatial match are kept (inner join).</span></p></div></div></td>
+<td class="info" align="left">Boolean</td>
+</tr>
+<tr>
+<td class="info">Match_Option</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>The spatial relationship criteria used to match features (e.g., INTERSECT, WITHIN_A_DISTANCE, CONTAINS, WITHIN).</span></p></div></div></td>
+<td class="info" align="left">String</td>
+</tr>
+<tr>
+<td class="info">Search_Radius (Optional)</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Join features within this distance of a target feature will be considered for the spatial join.</span></p></div></div></td>
+<td class="info" align="left">Linear Unit</td>
+</tr>
+<tr>
+<td class="info">Statistic Fields (SUM, MEAN, MEDIAN, MODE, STD, MIN, MAX, RANGE, COUNT, FIRST, LAST)</td>
+<td class="info" align="left">
+<span style="font-weight: bold">Dialog Reference</span><br><div style="text-align:Left;"><div><p><span>Each statistic type has a corresponding parameter where you select which join feature fields should be aggregated using that statistic. Multiple fields can be assigned to each statistic.</span></p></div></div></td>
+<td class="info" align="left">Multiple Value</td>
+</tr>
+</tbody>
+</table>
+
+## Requirements
+
+- **ArcGIS Pro** (ArcMap is no longer supported)
+- **Python 3+** (via ArcGIS Pro's conda environment)
+- **Python Libraries**: `arcpy`, `pandas`, `numpy`, `scipy`, `arcgis.features` (GeoAccessor)
+- **Spatial Analyst Extension** (required for Density To Vector)
+
+## Installation
+
+1. Download or clone this repository.
+2. In ArcGIS Pro, open the **Catalog** pane.
+3. Right-click **Toolboxes** and select **Add Toolbox**.
+4. Navigate to the `arc-sample-and-score.atbx` file in this repository and add it.
+
+## License
+
+This project is licensed under the Apache License 2.0. See [License.txt](License.txt) for details.
